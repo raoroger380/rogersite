@@ -1,20 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
-
-const ENCODED = "5Y+L6LCK5piv5Y+M5ZCR55qE77yB";
-
 export default function Signature() {
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    try {
-      setText(atob(ENCODED));
-    } catch {
-      setText("友谊是双向的！");
-    }
-  }, []);
-
   return (
     <section id="signature">
       <div className="section-container section-spacing">
@@ -31,12 +17,12 @@ export default function Signature() {
                 &ldquo;
               </div>
 
-              {/* 签名内容 */}
+              {/* 签名内容 — 直接显示Base64 */}
               <p
-                className="text-2xl md:text-3xl font-bold leading-relaxed gradient-text"
-                style={{ fontStyle: "italic" }}
+                className="text-xl md:text-2xl font-bold leading-relaxed gradient-text break-all"
+                style={{ fontStyle: "italic", wordBreak: "break-all" }}
               >
-                {text || "友谊是双向的！"}
+                5Y+L6LCK5piv5Y+M5ZCR55qE77yB
               </p>
 
               {/* 右引号 */}
