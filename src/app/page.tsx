@@ -3,10 +3,10 @@ import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import Signature from "@/components/Signature";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import Hobbies from "@/components/Hobbies";
+import Signature from "@/components/Signature";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -23,16 +23,16 @@ export default function Home() {
           <About />
         </div>
         <div className="section-block section-alt-bg">
-          <Signature />
-        </div>
-        <div className="section-block">
           <Projects />
         </div>
-        <div className="section-block section-alt-bg">
+        <div className="section-block">
           <Skills />
         </div>
-        <div className="section-block">
+        <div className="section-block section-alt-bg">
           <Hobbies />
+        </div>
+        <div className="section-block">
+          <Signature />
         </div>
         <div className="section-block section-alt-bg">
           <Contact />

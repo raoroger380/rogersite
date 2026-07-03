@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 const NAV_ITEMS = [
   { label: "首页", href: "#hero" },
   { label: "关于", href: "#about" },
-  { label: "签名", href: "#signature" },
   { label: "项目", href: "#projects" },
   { label: "技能", href: "#skills" },
   { label: "爱好", href: "#hobbies" },
+  { label: "签名", href: "#signature" },
   { label: "联系", href: "#contact" },
 ];
 
@@ -128,4 +128,5 @@ export default function Navbar() {
     </>
   );
 }
+
 

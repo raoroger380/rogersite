@@ -1,6 +1,20 @@
 ﻿"use client";
 
+import { useEffect, useState } from "react";
+
+const ENCODED = "5Y+L6LCK5piv5Y+M5ZCR55qE77yB";
+
 export default function Signature() {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    try {
+      setText(atob(ENCODED));
+    } catch {
+      setText("友谊是双向的！");
+    }
+  }, []);
+
   return (
     <section id="signature">
       <div className="section-container section-spacing">
@@ -22,7 +36,7 @@ export default function Signature() {
                 className="text-2xl md:text-3xl font-bold leading-relaxed gradient-text"
                 style={{ fontStyle: "italic" }}
               >
-                友谊是双向的！
+                {text || "友谊是双向的！"}
               </p>
 
               {/* 右引号 */}
