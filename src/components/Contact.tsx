@@ -97,7 +97,7 @@ export default function Contact() {
           transition={{ delay: 0.6 }}
           className="flex justify-center flex-wrap gap-3 mt-16"
         >
-          {["🎮 Minecraft", "🏸羽毛球", "🎵 听歌", "🖇 写代码", "📎 学习", "♠ 奶茶"].map((tag) => (
+          {["🎮 酸角洲", "🏸羽毛球", "🎵 听歌", "🖇 写代码", "📎 学习", "♠ 奶茶"].map((tag) => (
             <span
               key={tag}
               className="text-sm px-4 py-2 rounded-full border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--accent-purple)] hover:text-[var(--text-primary)] hover:bg-purple-50 transition-all duration-300 cursor-default"
