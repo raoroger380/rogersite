@@ -30,7 +30,7 @@ export default function About() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="w-44 h-44 md:w-52 md:h-52 rounded-2xl bg-[var(--accent-gradient)] flex items-center justify-center text-6xl shrink-0 shadow-lg shadow-purple-500/20"
+            className="w-44 h-44 md:w-52 md:h-52 rounded-2xl bg-[var(--accent-gradient)] flex items-center justify-center text-6xl shrink-0 shadow-[var(--accent-shadow)]"
           >
             👨‍💻
           </motion.div>

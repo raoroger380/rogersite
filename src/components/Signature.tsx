@@ -13,7 +13,7 @@ export default function Signature() {
           <div className="glass-card text-center">
             <div className="relative py-12 px-8">
               {/* 左引号 */}
-              <div className="absolute top-4 left-6 text-6xl leading-none opacity-10" style={{ color: "var(--accent-purple)" }}>
+              <div className="absolute top-4 left-6 text-6xl leading-none opacity-10" style={{ color: "var(--accent)" }}>
                 &ldquo;
               </div>
 
@@ -26,7 +26,7 @@ export default function Signature() {
               </p>
 
               {/* 右引号 */}
-              <div className="absolute bottom-4 right-6 text-6xl leading-none opacity-10" style={{ color: "var(--accent-cyan)" }}>
+              <div className="absolute bottom-4 right-6 text-6xl leading-none opacity-10" style={{ color: "var(--accent)" }}>
                 &rdquo;
               </div>
 

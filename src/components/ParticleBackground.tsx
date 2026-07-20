@@ -39,11 +39,14 @@ export default function ParticleBackground() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("touchmove", onTouchMove);
 
-    const purple = "124, 58, 237";
+    const getThemeColor = (name: string, fallback: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const { x: mx, y: my } = mouse;
+      const particleColor = getThemeColor("--particle-rgb", "79, 100, 117");
+      const linkColor = getThemeColor("--particle-link-rgb", "111, 132, 148");
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -69,7 +72,7 @@ export default function ParticleBackground() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${purple}, ${p.opacity})`;
+        ctx.fillStyle = `rgba(${particleColor}, ${p.opacity})`;
         ctx.fill();
       }
 
@@ -82,7 +85,7 @@ export default function ParticleBackground() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(${purple}, ${(1 - dist / 150) * 0.25})`;
+            ctx.strokeStyle = `rgba(${particleColor}, ${(1 - dist / 150) * 0.25})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -94,7 +97,7 @@ export default function ParticleBackground() {
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(mx, my);
-          ctx.strokeStyle = `rgba(8, 145, 178, ${(1 - dist / 150) * 0.35})`;
+          ctx.strokeStyle = `rgba(${linkColor}, ${(1 - dist / 150) * 0.35})`;
           ctx.lineWidth = 0.6;
           ctx.stroke();
         }

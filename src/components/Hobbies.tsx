@@ -7,14 +7,12 @@ const hobbies = [
     name: "VEX 机器人",
     desc: "参加 VEX 机器人竞赛，自己动手搭建机器人、编写自动程序，在赛场上和队友一起协作竞技。",
     details: ["机械结构设计", "自动程序编程", "团队协作竞技"],
-    color: "from-red-500 to-orange-500",
     emoji: "\u{1F916}",
   },
   {
     name: "航空",
     desc: "热爱航空知识，关注飞行器、民航和航空航天技术，梦想有一天能飞上蓝天。",
     details: ["飞行器知识", "民航航空", "航空航天技术"],
-    color: "from-sky-500 to-indigo-500",
     emoji: "\u{2708}\u{FE0F}",
   },
 ];
@@ -45,7 +43,7 @@ export default function Hobbies() {
                 className="glass-card overflow-hidden"
               >
                 {/* 顶部色条 */}
-                <div className={`h-2 w-full bg-gradient-to-r ${h.color}`} />
+                <div className="h-2 w-full bg-[var(--accent-gradient)]" />
 
                 <div className="flex flex-col items-center text-center">
                   <span className="text-5xl mt-8 mb-4">{h.emoji}</span>

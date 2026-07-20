@@ -11,6 +11,22 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "个人网站 | Airbus350-1000",
   description: "一名热爱技术的学生，专注于前端开发和交互设计。用代码构建美好的数字体验。",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/apple-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

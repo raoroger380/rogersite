@@ -8,21 +8,18 @@ const projects = [
     desc: "为班级定制的官方网站，包含口令加密访问、相册集、视频播放、网盘下载、通讯录等功能，集中存储班级活动的珍贵回忆。",
     tags: ["HTML5", "CSS3", "JavaScript", "SHA-256"],
     href: "https://github.com/raoroger380/class809",
-    color: "from-purple-500 to-pink-500",
   },
   {
     title: "生日贺卡",
     desc: "精美的交互式生日贺卡，包含粒子文字变形、互动蛋糕场景、麦克风吹蜡烛检测、祝福卡片和焰火特效。",
     tags: ["Canvas API", "Web Audio", "JavaScript"],
     href: "https://github.com/raoroger380/nywsr724",
-    color: "from-amber-500 to-rose-500",
   },
   {
     title: "这本身就是一个项目",
     desc: "这是我个人网站的源代码，使用 Next.js 13、Tailwind CSS 和 Framer Motion 构建，展示了我的个人信息、项目和技能。",
     tags: ["等你来填"],
     href: "https://github.com/raoroger380",
-    color: "from-cyan-500 to-blue-500",
   },
 ];
 
@@ -55,7 +52,7 @@ export default function Projects() {
                 className="glass-card overflow-hidden group cursor-pointer p-0 block"
                 style={{ perspective: "1000px" }}
               >
-                <div className={`h-1 w-full bg-gradient-to-r ${p.color}`} />
+                <div className="h-1 w-full bg-[var(--accent-gradient)]" />
                 <div className="p-8">
                   <h4 className="text-lg font-bold text-[var(--text-primary)] mb-4">{p.title}</h4>
                   <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">{p.desc}</p>

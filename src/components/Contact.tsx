@@ -53,13 +53,13 @@ export default function Contact() {
         >
           <button
             onClick={copyEmail}
-            className="glass-card flex items-center gap-4 cursor-pointer hover:border-[var(--accent-purple)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.12)] transition-all duration-300"
+            className="glass-card flex items-center gap-4 cursor-pointer hover:border-[var(--border-glow)] hover:shadow-[var(--card-shadow-hover)] transition-all duration-300"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--accent-cyan)]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--accent)]">
               <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/>
             </svg>
             <span className="text-base font-medium text-[var(--text-primary)]">{email}</span>
-            <span className={`text-sm transition-all ${copied ? "text-[var(--accent-cyan)]" : "text-[var(--text-tertiary)]"}`}>
+            <span className={`text-sm transition-all ${copied ? "text-[var(--accent)]" : "text-[var(--text-tertiary)]"}`}>
               {copied ? "✓ 已复制" : "复制"}
             </span>
           </button>
@@ -79,10 +79,10 @@ export default function Contact() {
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-card flex items-center gap-3 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-purple)] hover:shadow-[0_4px_16px_rgba(124,58,237,0.1)] transition-all duration-300 group"
+              className="glass-card flex items-center gap-3 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-glow)] hover:shadow-[var(--card-shadow-hover)] transition-all duration-300 group"
               aria-label={s.name}
             >
-              <span className="text-[var(--accent-purple)] opacity-70 group-hover:opacity-100 transition-opacity" dangerouslySetInnerHTML={{ __html: s.icon }} />
+              <span className="text-[var(--accent)] opacity-70 group-hover:opacity-100 transition-opacity" dangerouslySetInnerHTML={{ __html: s.icon }} />
               <span className="text-sm font-medium hidden md:inline">{s.name}</span>
               <span className="text-sm text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]">@{s.username}</span>
             </a>
@@ -100,7 +100,7 @@ export default function Contact() {
           {["🎮 酸角洲", "🏸羽毛球", "🎵 听歌", "🖇 写代码", "📎 学习", "♠ 奶茶"].map((tag) => (
             <span
               key={tag}
-              className="text-sm px-4 py-2 rounded-full border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--accent-purple)] hover:text-[var(--text-primary)] hover:bg-purple-50 transition-all duration-300 cursor-default"
+              className="text-sm px-4 py-2 rounded-full border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-glow)] hover:text-[var(--text-primary)] hover:bg-[var(--tag-hover)] transition-all duration-300 cursor-default"
             >
               {tag}
             </span>
