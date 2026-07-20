@@ -56,7 +56,7 @@ export default function Skills() {
         </div>
 
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl">
+          <div className="flex w-full max-w-5xl flex-col gap-5">
             {skillCategories.map((cat, ci) => (
               <motion.div
                 key={cat.name}
@@ -64,12 +64,13 @@ export default function Skills() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: ci * 0.1 }}
-                className="glass-card"
+                className="glass-card grid gap-6 md:grid-cols-[150px_1fr] md:items-center"
               >
-                <div className="glass-card-header">
-                  <h4 className="text-base font-bold text-[var(--text-primary)]">{cat.name}</h4>
+                <div className="md:border-r md:border-[var(--card-border)] md:pr-6">
+                  <p className="mb-2 text-xs tracking-[0.18em] text-[var(--text-tertiary)]">技能分类</p>
+                  <h4 className="text-xl font-bold text-[var(--text-primary)]">{cat.name}</h4>
                 </div>
-                <div className="glass-card-gap">
+                <div className="grid gap-5 md:grid-cols-2">
                   {cat.skills.map((s) => (
                     <div key={s.name} className="glass-card-item">
                       <div className="glass-card-item-label">
