@@ -4,6 +4,12 @@ import { motion } from "framer-motion";
 
 const projects = [
   {
+    title: "Auto-Xuhuohua（自动续火花）",
+    desc: "基于 AutoJs6 的抖音自动续火花脚本，每天自动给置顶好友发送消息维持火花。支持半自动和全自动模式，适配 iQOO 11S 等安卓设备。",
+    tags: ["AutoJs6", "JavaScript", "Android", "自动化"],
+    href: "https://github.com/raoroger380/Auto-Xuhuohua",
+  },
+  {
     title: "班级网站 - 澜石中学9班",
     desc: "为班级定制的官方网站，包含口令加密访问、相册集、视频播放、网盘下载、通讯录等功能，集中存储班级活动的珍贵回忆。",
     tags: ["HTML5", "CSS3", "JavaScript", "SHA-256"],
