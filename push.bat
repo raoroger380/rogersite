@@ -24,7 +24,7 @@ git commit -m "更新"
 
 echo.
 echo [3/3] 推送到 GitHub...
-git push origin main
+git push origin master
 
 if %errorlevel%==0 (
     echo.
