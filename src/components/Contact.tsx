@@ -53,7 +53,8 @@ export default function Contact() {
         >
           <button
             onClick={copyEmail}
-            className="glass-card flex items-center gap-4 cursor-pointer hover:border-[var(--border-glow)] hover:shadow-[var(--card-shadow-hover)] transition-all duration-300"
+            type="button"
+            className="liquid-glass-btn gap-4"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--accent)]">
               <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/>
@@ -79,7 +80,7 @@ export default function Contact() {
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-card flex items-center gap-3 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-glow)] hover:shadow-[var(--card-shadow-hover)] transition-all duration-300 group"
+              className="liquid-glass-btn gap-3 text-[var(--text-primary)] group"
               aria-label={s.name}
             >
               <span className="text-[var(--accent)] opacity-70 group-hover:opacity-100 transition-opacity" dangerouslySetInnerHTML={{ __html: s.icon }} />

@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className={`${inter.variable}`}>
+    <html lang="zh-CN" data-theme="dark" className={`${inter.variable}`}>
       <body style={{ fontFamily: "var(--font-inter), sans-serif" }}>
         {children}
       </body>

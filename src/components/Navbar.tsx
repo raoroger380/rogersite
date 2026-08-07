@@ -17,30 +17,38 @@ type Theme = "light" | "dark";
 
 export default function Navbar() {
   const [active, setActive] = useState("#hero");
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<Theme | null>(null);
+  const [navbarHidden, setNavbarHidden] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 50);
-      const sections = NAV_ITEMS.map((item) => item.href.slice(1));
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i]);
-        if (el && el.getBoundingClientRect().top <= 200) {
-          setActive(`#${sections[i]}`);
-          break;
-        }
+    const updateActive = () => {
+      const hash = window.location.hash || "#hero";
+      if (NAV_ITEMS.some((item) => item.href === hash)) {
+        setActive(hash);
       }
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    updateActive();
+    window.addEventListener("hashchange", updateActive);
+    return () => window.removeEventListener("hashchange", updateActive);
   }, []);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("theme") as Theme | null;
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(storedTheme ?? (prefersDark ? "dark" : "light"));
+    setTheme(storedTheme ?? "dark");
+  }, []);
+
+  useEffect(() => {
+    const onWheel = (event: WheelEvent) => {
+      if (event.deltaY > 0) {
+        setNavbarHidden(true);
+        setMenuOpen(false);
+      } else if (event.deltaY < 0) {
+        setNavbarHidden(false);
+      }
+    };
+    window.addEventListener("wheel", onWheel, { passive: true });
+    return () => window.removeEventListener("wheel", onWheel);
   }, []);
 
   useEffect(() => {
@@ -49,129 +57,144 @@ export default function Navbar() {
     window.localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const activeTheme = theme ?? "light";
+  const activeTheme = theme ?? "dark";
 
   const scrollTo = (href: string) => {
     setMenuOpen(false);
-    const el = document.querySelector(href);
-    el?.scrollIntoView({ behavior: "smooth" });
+    if (window.location.hash === href) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    window.location.hash = href;
   };
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "nav-blur" : "bg-transparent"
-        }`}
+      <motion.nav
+        initial={false}
+        animate={{ y: navbarHidden ? -120 : 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 0.61, 0.36, 1] }}
+        className="navbar-shell fixed top-0 left-0 right-0 z-50"
       >
-        <div className="section-container flex items-center justify-between h-16 md:h-20">
-          <button
-            onClick={() => scrollTo("#hero")}
-            className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)] tracking-tight hover:opacity-80 transition-opacity"
-            aria-label="返回首页"
-          >
-            <img
-              src="/site-icon.png"
-              alt="Airbus 350-1000 图标"
-              className="h-10 w-10 rounded-full object-cover ring-2 ring-[var(--card-bg)] shadow-sm"
-            />
-            <span className="gradient-text">Airbus 350-1000</span>
-          </button>
+        <div className="section-container flex items-center justify-between gap-3 md:gap-6">
+          <div className="nav-glass-island brand-glass flex shrink-0 items-center">
+            <button
+              onClick={() => scrollTo("#hero")}
+              className="group flex shrink-0 items-center gap-3 pr-1 text-lg font-bold text-[var(--text-primary)] tracking-tight transition-opacity hover:opacity-90"
+              aria-label="返回首页"
+            >
+              <span className="avatar-glass relative h-10 w-10 shrink-0 rounded-full p-[2px]">
+                <img
+                  src="/site-icon.png"
+                  alt="Airbus 350-1000 图标"
+                  className="h-full w-full rounded-full object-cover"
+                />
+                <span className="pointer-events-none absolute inset-0 rounded-full border border-white/45" />
+              </span>
+              <span className="brand-name gradient-text shrink-0 text-base md:text-lg">
+                Airbus 350-1000
+              </span>
+            </button>
+          </div>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="nav-glass-island nav-links-glass mx-auto hidden md:flex items-center p-1.5">
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.href}
                 onClick={() => scrollTo(item.href)}
-                className={`relative text-sm transition-colors ${
+                className={`nav-link-btn relative text-sm transition-colors ${
                   active === item.href
                     ? "text-[var(--text-primary)]"
                     : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
                 }`}
               >
-                {item.label}
+                <span className="relative z-10">{item.label}</span>
                 {active === item.href && (
-                  <motion.div
-                    layoutId="nav-indicator"
-                    className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-[var(--accent-gradient)]"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  <motion.span
+                    layoutId="nav-glass-pill"
+                    className="nav-active-glass absolute"
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
                   />
                 )}
               </button>
             ))}
           </div>
 
-          <button
-            onClick={() => setTheme((current) => ((current ?? "light") === "dark" ? "light" : "dark"))}
-            className="relative ml-auto md:ml-0 inline-flex h-9 w-[74px] items-center justify-between rounded-full border border-[var(--border-subtle)] bg-[var(--card-bg)] px-1.5 text-[var(--text-tertiary)] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--border-glow)] focus:outline-none focus:ring-2 focus:ring-[var(--border-glow)]"
-            aria-label={`切换到${activeTheme === "dark" ? "浅色" : "深色"}模式`}
-            type="button"
-          >
-            <motion.span
-              className="absolute top-1 h-7 w-7 rounded-full bg-[var(--accent)] shadow-[var(--accent-shadow)]"
-              animate={{ x: activeTheme === "dark" ? 34 : 0 }}
-              transition={{ type: "spring", stiffness: 420, damping: 32 }}
-            />
-            <span
-              className={`relative z-10 flex h-7 w-7 items-center justify-center transition-colors duration-300 ${
-                activeTheme === "light" ? "text-white" : "text-[var(--text-tertiary)]"
-              }`}
-              aria-hidden="true"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-              </svg>
-            </span>
-            <span
-              className={`relative z-10 flex h-7 w-7 items-center justify-center transition-colors duration-300 ${
-                activeTheme === "dark" ? "text-white" : "text-[var(--text-tertiary)]"
-              }`}
-              aria-hidden="true"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 14.7A8.5 8.5 0 0 1 9.3 3a.75.75 0 0 0-.82-1.1A10 10 0 1 0 22.1 15.52a.75.75 0 0 0-1.1-.82Z" />
-              </svg>
-            </span>
-          </button>
+          <div className="ml-auto flex shrink-0 items-center gap-3 md:ml-0">
+            <div className="nav-glass-island theme-glass inline-flex items-center p-1.5">
+              <button
+                onClick={() => setTheme((current) => ((current ?? "light") === "dark" ? "light" : "dark"))}
+                className="theme-switch relative inline-flex h-9 w-[74px] items-center justify-between text-[var(--text-tertiary)]"
+                aria-label={`切换到${activeTheme === "dark" ? "浅色" : "深色"}模式`}
+                type="button"
+              >
+                <motion.span
+                  className="theme-knob absolute"
+                  animate={{ x: activeTheme === "dark" ? 38 : 0 }}
+                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                />
+                <span
+                  className={`relative z-10 flex h-7 w-7 items-center justify-center transition-colors duration-300 ${
+                    activeTheme === "light" ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"
+                  }`}
+                  aria-hidden="true"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                  </svg>
+                </span>
+                <span
+                  className={`relative z-10 flex h-7 w-7 items-center justify-center transition-colors duration-300 ${
+                    activeTheme === "dark" ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"
+                  }`}
+                  aria-hidden="true"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 14.7A8.5 8.5 0 0 1 9.3 3a.75.75 0 0 0-.82-1.1A10 10 0 1 0 22.1 15.52a.75.75 0 0 0-1.1-.82Z" />
+                  </svg>
+                </span>
+              </button>
+            </div>
 
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden flex flex-col gap-1.5 p-2"
-            aria-label="Toggle menu"
-          >
-            <motion.span
-              animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-              className="block w-6 h-[2px] bg-[var(--text-primary)] rounded-full"
-            />
-            <motion.span
-              animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
-              className="block w-6 h-[2px] bg-[var(--text-primary)] rounded-full"
-            />
-            <motion.span
-              animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-              className="block w-6 h-[2px] bg-[var(--text-primary)] rounded-full"
-            />
-          </button>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="nav-glass-island menu-glass md:hidden inline-flex items-center justify-center"
+              aria-label="Toggle menu"
+            >
+              <motion.span
+                animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+                className="block w-6 h-[2px] bg-[var(--text-primary)] rounded-full"
+              />
+              <motion.span
+                animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
+                className="block w-6 h-[2px] bg-[var(--text-primary)] rounded-full"
+              />
+              <motion.span
+                animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+                className="block w-6 h-[2px] bg-[var(--text-primary)] rounded-full"
+              />
+            </button>
+          </div>
         </div>
-      </nav>
+      </motion.nav>
 
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 left-0 right-0 z-40 nav-blur md:hidden"
+            initial={{ opacity: 0, y: -16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -16, scale: 0.98 }}
+            className="mobile-nav-panel fixed top-24 left-4 right-4 z-40 md:hidden"
           >
-            <div className="flex flex-col p-6 gap-4">
+            <div className="flex flex-col gap-2 p-3">
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item.href}
                   onClick={() => scrollTo(item.href)}
-                  className={`text-left text-lg py-2 transition-colors ${
+                  className={`mobile-nav-link text-left text-lg transition-colors ${
                     active === item.href
-                      ? "text-[var(--text-primary)]"
+                      ? "active text-[var(--text-primary)]"
                       : "text-[var(--text-tertiary)]"
                   }`}
                 >
