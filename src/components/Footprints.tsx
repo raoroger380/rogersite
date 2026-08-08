@@ -157,6 +157,11 @@ export default function Footprints() {
   const [mapGeometry, setMapGeometry] = useState<MapGeometry | null>(null);
   const [mapLoadFailed, setMapLoadFailed] = useState(false);
   const [loadProgress, setLoadProgress] = useState(6);
+  const [cityTooltip, setCityTooltip] = useState<{
+    name: string;
+    x: number;
+    y: number;
+  } | null>(null);
   const zoomed = scale > 1.001;
   const detailed = scale >= DETAIL_SCALE;
   const cityLabelsVisible = scale >= CITY_LABEL_SCALE;
@@ -176,6 +181,21 @@ export default function Footprints() {
   } | null>(null);
   const zoomedRef = useRef(zoomed);
   const scaleRef = useRef(scale);
+
+  const showCityTooltip = (
+    element: SVGGElement,
+    name: string,
+  ) => {
+    const wrapRect = wrapRef.current?.getBoundingClientRect();
+    const markerRect = element.getBoundingClientRect();
+    if (!wrapRect) return;
+
+    setCityTooltip({
+      name,
+      x: markerRect.left + markerRect.width / 2 - wrapRect.left,
+      y: markerRect.top + markerRect.height / 2 - wrapRect.top,
+    });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -486,6 +506,7 @@ export default function Footprints() {
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerEnd}
               onPointerCancel={handlePointerEnd}
+              onClick={() => setCityTooltip(null)}
             >
               <svg
                 viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
@@ -563,27 +584,58 @@ export default function Footprints() {
                       key={place.name}
                       transform={`translate(${place.x} ${place.y})`}
                       className="china-map-marker"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`查看${place.name}`}
+                      onPointerEnter={(event) => {
+                        if (event.pointerType === "mouse") {
+                          showCityTooltip(event.currentTarget, place.name);
+                        }
+                      }}
+                      onPointerLeave={(event) => {
+                        if (event.pointerType === "mouse") {
+                          setCityTooltip(null);
+                        }
+                      }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        showCityTooltip(event.currentTarget, place.name);
+                      }}
+                      onFocus={(event) =>
+                        showCityTooltip(event.currentTarget, place.name)
+                      }
+                      onBlur={() => setCityTooltip(null)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          showCityTooltip(event.currentTarget, place.name);
+                        }
+                      }}
                     >
+                      <circle
+                        className="china-city-hit"
+                        r={24 / scale}
+                      />
                       <circle
                         className="china-city-core"
                         r={5 / markerShrink}
                         strokeWidth={1 / scale}
                       />
-                      {!detailed && (
-                        <text
-                          className="china-city-label"
-                          y={-17 / scale}
-                          textAnchor="middle"
-                          style={{ fontSize: `${12 / scale}px` }}
-                        >
-                          {place.name}
-                        </text>
-                      )}
                     </g>
                   ))}
                 </g>
               </svg>
             </div>
+
+            {cityTooltip && (
+              <div
+                className="china-city-tooltip"
+                style={{ left: cityTooltip.x, top: cityTooltip.y }}
+                role="tooltip"
+              >
+                {cityTooltip.name}
+              </div>
+            )}
 
             <div className="china-map-zoom-controls" aria-label="地图缩放">
               <button

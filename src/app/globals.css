@@ -1206,15 +1206,33 @@ body {
   stroke-width: 1.1;
   filter: drop-shadow(0 0 10px rgba(var(--map-lit-rgb), 1));
 }
-.china-city-label {
-  fill: var(--map-lit);
-  font-size: 11px;
-  font-weight: 700;
-  paint-order: stroke;
-  stroke: var(--bg-primary);
-  stroke-width: 2.5px;
-  stroke-linejoin: round;
-  letter-spacing: 0.04em;
+.china-city-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+  cursor: pointer;
+}
+.china-city-tooltip {
+  position: absolute;
+  z-index: 8;
+  pointer-events: none;
+  padding: 7px 12px;
+  border: 1px solid rgba(var(--accent-rgb), 0.42);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 14px));
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.48)),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.16), rgba(var(--accent-rgb), 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 8px 20px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
 }
 
 @keyframes visited-city-pulse {
@@ -1290,9 +1308,6 @@ body {
   .map-city-legend-item {
     font-size: 10px;
   }
-  .china-city-label {
-    font-size: 10px;
-  }
   .china-map-zoom-controls {
     right: 6px;
     gap: 5px;
@@ -1324,12 +1339,16 @@ body {
   .lit-cities-values {
     font-size: 10px;
   }
-  .china-city-label {
-    font-size: 9px;
-  }
   .china-city-core {
     r: 3.6;
   }
+}
+
+:root[data-theme="dark"] .china-city-tooltip {
+  border-color: rgba(var(--accent-rgb), 0.58);
+  background:
+    linear-gradient(135deg, rgba(20, 24, 34, 0.84), rgba(20, 24, 34, 0.62)),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-rgb), 0.05));
 }
 
 :root[data-theme="dark"] .china-map-svg path {
