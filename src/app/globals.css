@@ -1200,13 +1200,6 @@ body {
   opacity: 1;
   filter: drop-shadow(0 0 8px rgba(var(--map-lit-rgb), 0.75));
 }
-.china-city-halo {
-  fill: rgba(var(--map-lit-rgb), 0.2);
-  stroke: rgba(var(--map-lit-rgb), 0.95);
-  stroke-width: 1.5;
-  filter: drop-shadow(0 0 8px rgba(var(--map-lit-rgb), 0.9));
-  animation: visited-city-pulse 2s ease-in-out infinite;
-}
 .china-city-core {
   fill: var(--map-lit);
   stroke: rgba(255, 255, 255, 0.92);
@@ -1321,9 +1314,6 @@ body {
   }
   .china-city-label {
     font-size: 9px;
-  }
-  .china-city-halo {
-    r: 8;
   }
   .china-city-core {
     r: 3.6;

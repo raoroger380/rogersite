@@ -146,6 +146,7 @@ export default function Footprints() {
   const detailed = scale >= DETAIL_SCALE;
   const cityLabelsVisible = scale >= CITY_LABEL_SCALE;
   const progress = ((scale - MIN_SCALE) / (MAX_SCALE - MIN_SCALE)) * 100;
+  const markerShrink = Math.pow(Math.max(scale, 1), 1.25);
 
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const panRef = useRef<HTMLDivElement | null>(null);
@@ -551,13 +552,8 @@ export default function Footprints() {
                       className="china-map-marker"
                     >
                       <circle
-                        className="china-city-halo"
-                        r={10.5 / scale}
-                        strokeWidth={1.5 / scale}
-                      />
-                      <circle
                         className="china-city-core"
-                        r={5 / scale}
+                        r={5 / markerShrink}
                         strokeWidth={1 / scale}
                       />
                       {!detailed && (
