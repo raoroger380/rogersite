@@ -1,128 +1,77 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+
+const stats = [
+  { label: "AI写代码", value: "2年" },
+  { label: "项目", value: "3" },
+  { label: "技术栈", value: "0" },
+];
 
 export default function About() {
-  const [today, setToday] = useState("");
-
-  useEffect(() => {
-    const value = new Intl.DateTimeFormat("zh-CN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    setToday(value.replace(/\//g, "."));
-  }, []);
-
   return (
     <section
       id="about"
-      className="relative z-10 flex w-full items-center justify-center px-3 py-2 md:px-4 md:py-6"
+      className="relative z-10 flex min-h-full w-full items-center justify-center px-4 py-4 md:py-8"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 26, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
-        className="boarding-frame w-full max-w-[860px]"
-      >
-        <div className="boarding-pass w-full">
-          <div className="relative z-10 px-4 py-5 sm:px-12 sm:py-10">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--text-tertiary)] sm:text-[11px]">
-                Boarding Pass / 登机牌
-              </p>
-              <h3 className="mt-2 text-2xl font-bold gradient-text sm:text-4xl">
-                人生航班
-              </h3>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] tracking-[0.2em] text-[var(--text-tertiary)] sm:text-[11px]">
-                Airbus 350-1000
-              </p>
-              <span className="boarding-stamp">LIFE / 人生</span>
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3 sm:mt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-            <div className="flex items-center gap-4">
-              <img
-                src="/site-icon.png"
-                alt="Airbus 350-1000 头像"
-                className="h-14 w-14 rounded-full object-cover shadow-[0_10px_24px_rgba(0,0,0,0.18)] ring-1 ring-white/40 sm:h-20 sm:w-20"
-              />
-              <div>
-                <p className="boarding-field-label">乘客 / Passenger</p>
-                <p className="mt-1 text-xl font-bold text-[var(--text-primary)] sm:text-3xl">
-                  饶启烨
-                </p>
-                <p className="mt-1 text-xs text-[var(--text-tertiary)] sm:text-sm">学生 / 探索者</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5 sm:w-[340px] sm:gap-4">
-              <div className="boarding-field">
-                <span className="boarding-field-label">航班</span>
-                <strong>人生</strong>
-              </div>
-              <div className="boarding-field">
-                <span className="boarding-field-label">座位</span>
-                <strong>佛山</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-4 sm:gap-4">
-            <div className="boarding-field">
-              <span className="boarding-field-label">舱位</span>
-              <strong>学生</strong>
-            </div>
-            <div className="boarding-field">
-              <span className="boarding-field-label">状态</span>
-              <strong>探索中</strong>
-            </div>
-            <div className="boarding-field">
-              <span className="boarding-field-label">日期</span>
-              <strong>{today || "------"}</strong>
-            </div>
-            <div className="boarding-field">
-              <span className="boarding-field-label">目的地</span>
-              <strong>下一站</strong>
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-2 sm:gap-4">
-            <div className="boarding-route">
-              <span className="boarding-field-label">出发地</span>
-              <strong>校园</strong>
-            </div>
-            <div className="boarding-route">
-              <span className="boarding-field-label">目标</span>
-              <strong>考上好大学</strong>
-            </div>
-          </div>
-          </div>
-
-          <div className="boarding-perforation" />
-
-          <div className="relative z-10 flex flex-row items-center justify-between gap-3 px-4 py-4 sm:gap-5 sm:px-12 sm:py-7">
-            <div className="text-left">
-              <p className="hidden text-[11px] uppercase tracking-[0.22em] text-[var(--text-tertiary)] sm:block">
-                RQY · Life Flight · 佛山 → 下一站
-              </p>
-              <p className="text-sm font-semibold text-[var(--text-primary)] sm:mt-1 sm:text-base">
-                人生航班正在登机
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="boarding-barcode" aria-hidden="true" />
-              <span className="text-[8px] tracking-[0.18em] text-[var(--text-tertiary)] sm:text-[9px]">
-                RQY-2026
-              </span>
-            </div>
-          </div>
+      <div className="section-container w-full max-w-5xl">
+        <div className="section-header mb-8 md:mb-14">
+          <p className="overline">关于我</p>
+          <h3>
+            一个爱折腾的<span className="gradient-text">学生开发者</span>
+          </h3>
+          <p>
+            我是一名 14 岁的学生，从小就开始对代码感兴趣。
+            从 Scratch 到C++，一路走来学到了很多。
+            喜欢用代码实现自己的想法，也喜欢探索新技术。
+          </p>
         </div>
-      </motion.div>
+
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 mb-8 md:mb-14">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="h-32 w-32 shrink-0 rounded-2xl bg-[var(--accent-gradient)] text-5xl shadow-[var(--accent-shadow)] flex items-center justify-center md:h-52 md:w-52 md:text-6xl"
+          >
+            👨‍💻
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-xl space-y-4 text-sm text-[var(--text-secondary)] leading-relaxed md:space-y-5 md:text-base md:leading-loose"
+          >
+            <p>
+              大家好！我是饶启烨，一名热爱编程的初中生。我在 2024 年开始接触编程，
+              从最初的 C++ 开发到现在的 Web 开发，编程已经成为我生活中不可或缺的一部分。
+            </p>
+            <p>
+              除了写代码，我还喜欢打羽毛球、听音乐和打三角洲。我相信技术可以改变世界，
+              而我希望能用自己学到的知识做出一些有意义的东西。
+            </p>
+          </motion.div>
+        </div>
+
+        <div className="flex flex-wrap items-stretch justify-center gap-2 md:gap-8">
+          {stats.map((s) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="glass-card text-center min-w-[100px] md:min-w-[120px]"
+              style={{ padding: "14px 12px" }}
+            >
+              <div className="text-2xl font-bold gradient-text mb-2">{s.value}</div>
+              <div className="text-sm text-[var(--text-tertiary)]">{s.label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

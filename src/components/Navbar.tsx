@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_ITEMS = [
-  { label: "首页", href: "#hero" },
-  { label: "关于", href: "#about" },
-  { label: "项目", href: "#projects" },
-  { label: "爱好", href: "#hobbies" },
-  { label: "签名", href: "#signature" },
-  { label: "联系", href: "#contact" },
+  { label: "首页", href: "#hero", ids: ["#hero"] },
+  { label: "关于", href: "#about", ids: ["#about"] },
+  { label: "项目", href: "#projects", ids: ["#projects"] },
+  { label: "足迹", href: "#footprints", ids: ["#footprints", "#footprints-album"] },
+  { label: "爱好", href: "#hobbies", ids: ["#hobbies"] },
+  { label: "签名", href: "#signature", ids: ["#signature"] },
+  { label: "联系", href: "#contact", ids: ["#contact"] },
 ];
 
 type Theme = "light" | "dark";
@@ -23,8 +24,9 @@ export default function Navbar() {
   useEffect(() => {
     const updateActive = () => {
       const hash = window.location.hash || "#hero";
-      if (NAV_ITEMS.some((item) => item.href === hash)) {
-        setActive(hash);
+      const matched = NAV_ITEMS.find((item) => item.ids.includes(hash));
+      if (matched) {
+        setActive(matched.href);
       }
     };
     updateActive();

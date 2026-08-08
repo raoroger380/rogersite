@@ -3,7 +3,16 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const PAGE_ORDER = ["hero", "about", "projects", "hobbies", "signature", "contact"];
+const PAGE_ORDER = [
+  "hero",
+  "about",
+  "projects",
+  "footprints",
+  "footprints-album",
+  "hobbies",
+  "signature",
+  "contact",
+];
 
 export default function PageNavigator({ pages }: { pages: Record<string, ReactNode> }) {
   const [page, setPage] = useState("hero");
