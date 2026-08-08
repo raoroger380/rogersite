@@ -1,10 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PHOTO_SLOTS = Array.from({ length: 6 }, (_, index) => ({
   id: index + 1,
+  src: [
+    "/photos/beijing.jpg",
+    "/photos/chongqing.jpg",
+    "/photos/guangzhou.jpg",
+    "/photos/guangzhou-2.jpg",
+    "/photos/shenzhen.jpg",
+    "/photos/shenzhen-2.jpg",
+  ][index],
+  alt: ["北京", "重庆", "广州", "广州 2", "深圳", "深圳 2"][index],
 }));
 
 function CameraIcon() {
@@ -26,28 +36,77 @@ function CameraIcon() {
   );
 }
 
-function PhotoCard({ compact = false }: { compact?: boolean }) {
+function PhotoCard({
+  compact = false,
+  photo,
+  onOpen,
+}: {
+  compact?: boolean;
+  photo?: { src: string; alt: string };
+  onOpen?: (photo: { src: string; alt: string }) => void;
+}) {
+  const cardClassName = compact
+    ? "album-photo album-photo-compact"
+    : "album-photo";
+
+  if (!photo) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.42 }}
+        className={cardClassName}
+      >
+        <div className="album-photo-inner">
+          <CameraIcon />
+          <span>PHOTO</span>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
-    <motion.div
+    <motion.button
+      type="button"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.42 }}
-      className={compact ? "album-photo album-photo-compact" : "album-photo"}
+      className={cardClassName}
+      onClick={() => onOpen?.(photo)}
+      aria-label={`查看${photo.alt}照片`}
     >
       <div className="album-photo-inner">
+        <span className="album-photo-name">{photo.alt}</span>
         <CameraIcon />
-        <span>PHOTO</span>
+        <span className="album-photo-hint">点击可观看</span>
       </div>
-    </motion.div>
+    </motion.button>
   );
 }
 
 export default function FootprintsAlbum() {
   const [active, setActive] = useState(0);
+  const [selectedPhoto, setSelectedPhoto] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
 
   const goTo = (next: number) => {
     setActive((next + PHOTO_SLOTS.length) % PHOTO_SLOTS.length);
   };
+
+  useEffect(() => {
+    if (!selectedPhoto) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedPhoto(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedPhoto]);
 
   return (
     <section id="footprints-album" className="album-section relative z-10">
@@ -62,7 +121,11 @@ export default function FootprintsAlbum() {
 
         <div className="album-grid hidden md:grid">
           {PHOTO_SLOTS.map((slot) => (
-            <PhotoCard key={slot.id} />
+            <PhotoCard
+              key={slot.id}
+              photo={slot}
+              onOpen={setSelectedPhoto}
+            />
           ))}
         </div>
 
@@ -76,7 +139,11 @@ export default function FootprintsAlbum() {
               transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
               className="album-mobile-photo"
             >
-              <PhotoCard compact />
+              <PhotoCard
+                compact
+                photo={PHOTO_SLOTS[active]}
+                onOpen={setSelectedPhoto}
+              />
             </motion.div>
           </AnimatePresence>
 
@@ -135,6 +202,51 @@ export default function FootprintsAlbum() {
           </div>
         </div>
       </div>
+
+      {selectedPhoto &&
+        createPortal(
+          <motion.div
+            className="photo-lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-label={selectedPhoto.alt}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setSelectedPhoto(null)}
+            onWheel={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
+            onTouchMove={(event) => event.stopPropagation()}
+            onTouchEnd={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="photo-lightbox-close"
+              onClick={() => setSelectedPhoto(null)}
+              aria-label="关闭图片"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+            <img
+              src={selectedPhoto.src}
+              alt={selectedPhoto.alt}
+              className="photo-lightbox-image"
+              onClick={(event) => event.stopPropagation()}
+            />
+          </motion.div>,
+          document.body,
+        )}
     </section>
   );
 }

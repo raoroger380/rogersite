@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const nameText = "你好，我是";
 const nameHighlight = "饶启烨";
-const tagline = "14岁 / 学生 / 代码爱好者";
+const tagline = "15岁 / 学生 / 代码爱好者";
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.04 } } };
 const letterVariant = {
