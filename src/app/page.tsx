@@ -5,7 +5,6 @@ import PageNavigator from "@/components/PageNavigator";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Projects from "@/components/Projects";
-import Skills from "@/components/Skills";
 import Hobbies from "@/components/Hobbies";
 import Signature from "@/components/Signature";
 import Contact from "@/components/Contact";
@@ -14,7 +13,6 @@ const PAGES = {
   hero: <Hero />,
   about: <About />,
   projects: <Projects />,
-  skills: <Skills />,
   hobbies: <Hobbies />,
   signature: <Signature />,
   contact: <Contact />,

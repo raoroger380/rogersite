@@ -23,7 +23,7 @@ const projects = [
   },
   {
     title: "这本身就是一个项目",
-    desc: "这是我个人网站的源代码，使用 Next.js 13、Tailwind CSS 和 Framer Motion 构建，展示了我的个人信息、项目和技能。",
+    desc: "这是我个人网站的源代码，使用 Next.js 13、Tailwind CSS 和 Framer Motion 构建，展示了我的个人信息和项目。",
     tags: ["等你来填"],
     href: "https://github.com/raoroger380",
   },

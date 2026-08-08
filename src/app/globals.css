@@ -66,6 +66,7 @@ html {
   height: 100%;
   overflow: hidden;
   scroll-behavior: smooth;
+  overscroll-behavior: none;
 }
 body {
   height: 100%;
@@ -73,6 +74,7 @@ body {
   color: var(--text-secondary);
   font-family: "Inter", sans-serif;
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
@@ -82,6 +84,7 @@ body {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
+  touch-action: none;
 }
 .page-screen {
   display: flex;
@@ -682,6 +685,184 @@ body {
     width: 40px;
     height: 40px;
   }
+}
+
+/* ===== 登机牌 ===== */
+.boarding-frame {
+  position: relative;
+  border: 1px solid rgba(var(--accent-rgb), 0.32);
+  border-radius: 38px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.22)),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.02));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -10px 24px rgba(255, 255, 255, 0.08),
+    0 20px 46px rgba(var(--accent-rgb), 0.16);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  isolation: isolate;
+}
+.boarding-frame::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 30px;
+  pointer-events: none;
+}
+.boarding-frame > .boarding-pass {
+  position: relative;
+  z-index: 1;
+}
+
+.boarding-pass {
+  position: relative;
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.32)),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.16), rgba(var(--accent-rgb), 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -12px 24px rgba(255, 255, 255, 0.12),
+    0 22px 48px rgba(var(--accent-rgb), 0.18);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  isolation: isolate;
+  overflow: hidden;
+}
+.boarding-pass::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 52%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+.boarding-pass > * {
+  position: relative;
+  z-index: 1;
+}
+
+.boarding-field,
+.boarding-route {
+  min-width: 0;
+  min-height: 74px;
+  border: 1px solid rgba(var(--accent-rgb), 0.16);
+  border-radius: 20px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.boarding-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.boarding-field strong,
+.boarding-route strong {
+  display: block;
+  margin-top: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.boarding-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 7px 12px;
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.boarding-perforation {
+  height: 1px;
+  margin: 0 32px;
+  border-top: 2px dashed rgba(var(--accent-rgb), 0.32);
+}
+
+.boarding-barcode {
+  width: 200px;
+  height: 52px;
+  border-radius: 10px;
+  color: rgba(var(--accent-rgb), 0.9);
+  background:
+    repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 4px, currentColor 0 6px, transparent 6px 8px, currentColor 0 10px, transparent 10px 11px, currentColor 0 14px, transparent 14px 16px);
+  opacity: 0.9;
+}
+
+@media (min-width: 640px) {
+  .boarding-field,
+  .boarding-route {
+    min-height: 94px;
+    padding: 22px 26px;
+    border-radius: 22px;
+  }
+  .boarding-field-label {
+    font-size: 13px;
+  }
+  .boarding-field strong,
+  .boarding-route strong {
+    margin-top: 10px;
+    font-size: 22px;
+  }
+  .boarding-barcode {
+    width: 240px;
+    height: 60px;
+  }
+}
+
+:root[data-theme="dark"] .boarding-pass {
+  border-color: rgba(var(--accent-rgb), 0.3);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03) 48%, rgba(255, 255, 255, 0.08)),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.16), rgba(var(--accent-rgb), 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -12px 24px rgba(255, 255, 255, 0.05),
+    0 22px 48px rgba(0, 0, 0, 0.28);
+}
+:root[data-theme="dark"] .boarding-frame {
+  border-color: rgba(var(--accent-rgb), 0.34);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.06)),
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.12), rgba(var(--accent-rgb), 0.02));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -10px 24px rgba(255, 255, 255, 0.04),
+    0 20px 46px rgba(0, 0, 0, 0.26);
+}
+:root[data-theme="dark"] .boarding-frame::before {
+  border-color: rgba(var(--accent-rgb), 0.18);
+}
+:root[data-theme="dark"] .boarding-pass::before {
+  opacity: 0.24;
+}
+:root[data-theme="dark"] .boarding-field,
+:root[data-theme="dark"] .boarding-route {
+  border-color: rgba(var(--accent-rgb), 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+:root[data-theme="dark"] .boarding-stamp {
+  border-color: rgba(var(--accent-rgb), 0.42);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* ===== 进度条 ===== */

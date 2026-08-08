@@ -7,7 +7,6 @@ const NAV_ITEMS = [
   { label: "首页", href: "#hero" },
   { label: "关于", href: "#about" },
   { label: "项目", href: "#projects" },
-  { label: "技能", href: "#skills" },
   { label: "爱好", href: "#hobbies" },
   { label: "签名", href: "#signature" },
   { label: "联系", href: "#contact" },
@@ -48,7 +47,31 @@ export default function Navbar() {
       }
     };
     window.addEventListener("wheel", onWheel, { passive: true });
-    return () => window.removeEventListener("wheel", onWheel);
+
+    let touchStartY = 0;
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      touchStartY = event.touches[0].clientY;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      const deltaY = event.touches[0].clientY - touchStartY;
+      if (Math.abs(deltaY) < 14) return;
+      if (deltaY > 0) {
+        setNavbarHidden(false);
+      } else {
+        setNavbarHidden(true);
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+    };
   }, []);
 
   useEffect(() => {
