@@ -11,6 +11,8 @@
   --accent-purple: var(--accent);
   --accent-cyan: var(--accent-soft);
   --accent-gradient: linear-gradient(135deg, #4f6475, #7f8f9a);
+  --map-lit: #e4a72c;
+  --map-lit-rgb: 228, 167, 44;
   --text-primary: #171b1f;
   --text-secondary: #4c545b;
   --text-tertiary: #7f878e;
@@ -44,6 +46,8 @@
   --accent-purple: var(--accent);
   --accent-cyan: var(--accent-soft);
   --accent-gradient: linear-gradient(135deg, #9aaab5, #d0d7dc);
+  --map-lit: #ffcf6e;
+  --map-lit-rgb: 255, 207, 110;
   --text-primary: #f2eee8;
   --text-secondary: #c4beb5;
   --text-tertiary: #8f968f;
@@ -862,6 +866,37 @@ body {
   font-weight: 600;
   color: var(--text-primary);
 }
+.map-city-legend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.map-city-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+.map-city-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+.map-city-legend-dot.lit {
+  background: var(--map-lit);
+  box-shadow:
+    0 0 0 3px rgba(var(--map-lit-rgb), 0.2),
+    0 0 10px rgba(var(--map-lit-rgb), 0.72);
+}
+.map-city-legend-dot.dim {
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  box-shadow: none;
+}
 
 .china-map-stage {
   display: flex;
@@ -873,6 +908,10 @@ body {
 }
 
 .china-map-loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
   width: min(420px, 82%);
   padding: 28px 22px;
   border: 1px solid rgba(var(--accent-rgb), 0.28);
@@ -893,6 +932,37 @@ body {
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   backdrop-filter: blur(18px) saturate(160%);
 }
+.china-map-loading-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.china-map-progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.16);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.china-map-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--map-lit),
+    rgba(255, 246, 214, 0.96)
+  );
+  box-shadow: 0 0 12px rgba(var(--map-lit-rgb), 0.65);
+  transition: width 0.25s ease;
+}
+.china-map-loading-percent {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--map-lit);
+  letter-spacing: 0.04em;
+}
 
 .china-map-zoom-wrap {
   position: relative;
@@ -905,6 +975,7 @@ body {
   width: 100%;
   height: 100%;
   cursor: grab;
+  touch-action: none;
   transform-origin: 50% 50%;
   will-change: transform;
   user-select: none;
@@ -1088,22 +1159,29 @@ body {
   pointer-events: auto;
 }
 .china-map-svg .china-detail-path {
-  fill: rgba(var(--accent-rgb), 0.08);
-  stroke: rgba(var(--accent-rgb), 0.48);
-  stroke-width: 0.7;
+  fill: rgba(var(--accent-rgb), 0.035);
+  stroke: rgba(var(--accent-rgb), 0.26);
+  stroke-width: 0.55;
+  opacity: 0.82;
   transition:
     fill 0.3s ease,
-    stroke 0.3s ease;
+    stroke 0.3s ease,
+    opacity 0.3s ease,
+    filter 0.3s ease;
 }
 .china-map-svg .china-detail-path.visited {
-  fill: rgba(var(--accent-rgb), 0.22);
-  stroke: rgba(var(--accent-rgb), 0.86);
-  stroke-width: 0.9;
+  fill: rgba(var(--map-lit-rgb), 0.3);
+  stroke: var(--map-lit);
+  stroke-width: 1.7;
+  opacity: 1;
+  filter: drop-shadow(0 0 5px rgba(var(--map-lit-rgb), 0.72));
+  animation: visited-city-pulse 2.2s ease-in-out infinite;
 }
 .china-detail-label {
-  fill: var(--text-secondary);
-  font-size: 9px;
-  font-weight: 600;
+  fill: var(--text-tertiary);
+  font-size: 8.5px;
+  font-weight: 500;
+  opacity: 0.56;
   text-anchor: middle;
   dominant-baseline: middle;
   paint-order: stroke;
@@ -1115,26 +1193,28 @@ body {
   user-select: none;
 }
 .china-detail-label.visited {
-  fill: var(--accent);
+  fill: var(--map-lit);
   stroke: var(--bg-primary);
-  stroke-width: 1.6px;
-  font-weight: 800;
-  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.4));
+  stroke-width: 2px;
+  font-weight: 900;
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(var(--map-lit-rgb), 0.75));
 }
 .china-city-halo {
-  fill: rgba(255, 255, 255, 0.12);
-  stroke: rgba(var(--accent-rgb), 0.72);
-  stroke-width: 1.3;
-  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.5));
+  fill: rgba(var(--map-lit-rgb), 0.2);
+  stroke: rgba(var(--map-lit-rgb), 0.95);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 8px rgba(var(--map-lit-rgb), 0.9));
+  animation: visited-city-pulse 2s ease-in-out infinite;
 }
 .china-city-core {
-  fill: var(--accent);
-  stroke: rgba(255, 255, 255, 0.75);
-  stroke-width: 1;
-  filter: drop-shadow(0 0 7px rgba(var(--accent-rgb), 0.85));
+  fill: var(--map-lit);
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 1.1;
+  filter: drop-shadow(0 0 10px rgba(var(--map-lit-rgb), 1));
 }
 .china-city-label {
-  fill: var(--text-primary);
+  fill: var(--map-lit);
   font-size: 11px;
   font-weight: 700;
   paint-order: stroke;
@@ -1142,6 +1222,16 @@ body {
   stroke-width: 2.5px;
   stroke-linejoin: round;
   letter-spacing: 0.04em;
+}
+
+@keyframes visited-city-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(var(--map-lit-rgb), 0.55));
+  }
+  50% {
+    filter: drop-shadow(0 0 11px rgba(var(--map-lit-rgb), 0.95));
+  }
 }
 
 .china-province-label {
@@ -1188,6 +1278,12 @@ body {
   }
   .lit-cities-values {
     font-size: 11px;
+  }
+  .map-city-legend {
+    gap: 10px;
+  }
+  .map-city-legend-item {
+    font-size: 10px;
   }
   .china-city-label {
     font-size: 10px;
@@ -1249,12 +1345,16 @@ body {
   stroke: rgba(var(--accent-rgb), 0.68);
 }
 :root[data-theme="dark"] .china-map-svg .china-detail-path {
-  fill: rgba(var(--accent-rgb), 0.07);
-  stroke: rgba(var(--accent-rgb), 0.42);
+  fill: rgba(var(--accent-rgb), 0.03);
+  stroke: rgba(var(--accent-rgb), 0.22);
+  opacity: 0.72;
 }
 :root[data-theme="dark"] .china-map-svg .china-detail-path.visited {
-  fill: rgba(var(--accent-rgb), 0.2);
-  stroke: rgba(var(--accent-rgb), 0.84);
+  fill: rgba(var(--map-lit-rgb), 0.34);
+  stroke: var(--map-lit);
+  stroke-width: 1.8;
+  opacity: 1;
+  filter: drop-shadow(0 0 7px rgba(var(--map-lit-rgb), 0.85));
 }
 :root[data-theme="dark"] .china-map-zoom-controls {
   border-color: rgba(var(--accent-rgb), 0.38);

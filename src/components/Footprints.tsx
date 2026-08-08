@@ -141,6 +141,7 @@ export default function Footprints() {
   const [pan, setPan] = useState<PanState>({ x: 0, y: 0 });
   const [mapGeometry, setMapGeometry] = useState<MapGeometry | null>(null);
   const [mapLoadFailed, setMapLoadFailed] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(6);
   const zoomed = scale > 1.001;
   const detailed = scale >= DETAIL_SCALE;
   const cityLabelsVisible = scale >= CITY_LABEL_SCALE;
@@ -162,13 +163,24 @@ export default function Footprints() {
 
   useEffect(() => {
     let cancelled = false;
+    let finishTimer: number | undefined;
+    let progressStep = 6;
 
     const loadMap = async () => {
+      const progressTimer = window.setInterval(() => {
+        progressStep = Math.min(
+          progressStep + 6 + (progressStep % 7),
+          92,
+        );
+        setLoadProgress(progressStep);
+      }, 160);
+
       try {
         const [chinaModule, provinceModule] = await Promise.all([
           import("china-map-geojson/lib/china"),
           import("china-map-geojson/lib/province"),
         ]);
+        setLoadProgress(96);
         const chinaData = resolveCjsDefault<ChinaGeoCollection>(chinaModule);
         const provinceCollections = Object.values(
           resolveCjsDefault<Record<string, ChinaGeoCollection>>(provinceModule),
@@ -177,9 +189,16 @@ export default function Footprints() {
           chinaData,
           provinceCollections,
         );
-        if (!cancelled) setMapGeometry(nextGeometry);
+        if (!cancelled) {
+          setLoadProgress(100);
+          finishTimer = window.setTimeout(() => {
+            if (!cancelled) setMapGeometry(nextGeometry);
+          }, 180);
+        }
       } catch {
         if (!cancelled) setMapLoadFailed(true);
+      } finally {
+        window.clearInterval(progressTimer);
       }
     };
 
@@ -187,6 +206,7 @@ export default function Footprints() {
 
     return () => {
       cancelled = true;
+      if (finishTimer !== undefined) window.clearTimeout(finishTimer);
     };
   }, []);
 
@@ -203,11 +223,11 @@ export default function Footprints() {
     if (!el) return;
 
     const blockPageNav = (event: Event) => {
-      if (zoomedRef.current) event.stopPropagation();
+      event.stopPropagation();
     };
     const blockTouchMove = (event: TouchEvent) => {
+      event.stopPropagation();
       if (zoomedRef.current) {
-        event.stopPropagation();
         event.preventDefault();
       }
     };
@@ -234,15 +254,17 @@ export default function Footprints() {
     el.addEventListener("touchstart", blockPageNav, { passive: true });
     el.addEventListener("touchmove", blockTouchMove, { passive: false });
     el.addEventListener("touchend", blockPageNav, { passive: true });
+    el.addEventListener("touchcancel", blockPageNav, { passive: true });
     el.addEventListener("wheel", handleWheel, { passive: false });
 
     return () => {
       el.removeEventListener("touchstart", blockPageNav);
       el.removeEventListener("touchmove", blockTouchMove);
       el.removeEventListener("touchend", blockPageNav);
+      el.removeEventListener("touchcancel", blockPageNav);
       el.removeEventListener("wheel", handleWheel);
     };
-  }, []);
+  }, [mapGeometry !== null]);
 
   useEffect(() => {
     const el = sliderTrackRef.current;
@@ -259,13 +281,15 @@ export default function Footprints() {
     el.addEventListener("touchstart", stopNav, { passive: true });
     el.addEventListener("touchmove", stopTouchMove, { passive: false });
     el.addEventListener("touchend", stopNav, { passive: true });
+    el.addEventListener("touchcancel", stopNav, { passive: true });
 
     return () => {
       el.removeEventListener("touchstart", stopNav);
       el.removeEventListener("touchmove", stopTouchMove);
       el.removeEventListener("touchend", stopNav);
+      el.removeEventListener("touchcancel", stopNav);
     };
-  }, []);
+  }, [mapGeometry !== null]);
 
   const getBounds = () => {
     const rect = wrapRef.current?.getBoundingClientRect();
@@ -372,9 +396,33 @@ export default function Footprints() {
               role="status"
               aria-live="polite"
             >
-              {mapLoadFailed
-                ? "地图加载失败，请刷新页面重试"
-                : "正在加载全国地图..."}
+              {mapLoadFailed ? (
+                <span className="china-map-loading-title">
+                  地图加载失败，请刷新页面重试
+                </span>
+              ) : (
+                <>
+                  <span className="china-map-loading-title">
+                    正在加载全国地图...
+                  </span>
+                  <div
+                    className="china-map-progress"
+                    role="progressbar"
+                    aria-label="地图加载进度"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(loadProgress)}
+                  >
+                    <span
+                      className="china-map-progress-fill"
+                      style={{ width: `${loadProgress}%` }}
+                    />
+                  </div>
+                  <span className="china-map-loading-percent">
+                    {Math.round(loadProgress)}%
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -397,6 +445,16 @@ export default function Footprints() {
           <span className="lit-cities-label">已点亮城市</span>
           <span className="lit-cities-values">
             佛山 · 广州 · 深圳 · 香港 · 北京 · 梅州
+          </span>
+          <span className="map-city-legend" aria-label="城市图例">
+            <span className="map-city-legend-item">
+              <i className="map-city-legend-dot lit" />
+              已点亮
+            </span>
+            <span className="map-city-legend-item">
+              <i className="map-city-legend-dot dim" />
+              未点亮
+            </span>
           </span>
         </div>
 
@@ -475,7 +533,9 @@ export default function Footprints() {
                         className={`china-detail-label ${
                           label.visited ? "visited" : ""
                         }`}
-                        style={{ fontSize: `${9 / scale}px` }}
+                        style={{
+                          fontSize: `${(label.visited ? 10.5 : 8.5) / scale}px`,
+                        }}
                       >
                         {label.name}
                       </text>
@@ -492,20 +552,20 @@ export default function Footprints() {
                     >
                       <circle
                         className="china-city-halo"
-                        r={9 / scale}
-                        strokeWidth={1.2 / scale}
+                        r={10.5 / scale}
+                        strokeWidth={1.5 / scale}
                       />
                       <circle
                         className="china-city-core"
-                        r={4 / scale}
+                        r={5 / scale}
                         strokeWidth={1 / scale}
                       />
                       {!detailed && (
                         <text
                           className="china-city-label"
-                          y={-14 / scale}
+                          y={-17 / scale}
                           textAnchor="middle"
-                          style={{ fontSize: `${11 / scale}px` }}
+                          style={{ fontSize: `${12 / scale}px` }}
                         >
                           {place.name}
                         </text>
