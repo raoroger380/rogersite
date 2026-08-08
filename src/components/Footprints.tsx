@@ -8,6 +8,10 @@ const VIEW_W = 1200;
 const VIEW_H = 720;
 
 const VISITED_PLACES = [
+  { name: "广州", lon: 113.2644, lat: 23.1291 },
+  { name: "佛山", lon: 113.1219, lat: 23.0218 },
+  { name: "深圳", lon: 114.0579, lat: 22.5431 },
+  { name: "香港", lon: 114.1694, lat: 22.3193 },
   { name: "重庆", lon: 106.5516, lat: 29.563 },
   { name: "武汉", lon: 114.3896, lat: 30.6628 },
   { name: "长沙", lon: 113.0823, lat: 28.2568 },
@@ -19,10 +23,6 @@ const VISITED_PLACES = [
   { name: "汕头", lon: 117.1692, lat: 23.3405 },
   { name: "江门", lon: 112.6318, lat: 22.1484 },
   { name: "无锡", lon: 120.3442, lat: 31.5527 },
-  { name: "佛山", lon: 113.1219, lat: 23.0218 },
-  { name: "广州", lon: 113.2644, lat: 23.1291 },
-  { name: "深圳", lon: 114.0579, lat: 22.5431 },
-  { name: "香港", lon: 114.1694, lat: 22.3193 },
   { name: "北京", lon: 116.4074, lat: 39.9042 },
   { name: "梅州", lon: 116.1225, lat: 24.2886 },
 ];
