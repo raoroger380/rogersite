@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const projects = [
   {
@@ -29,49 +30,120 @@ const projects = [
   },
 ];
 
-export default function Projects() {
+type Project = (typeof projects)[number];
+
+function ProjectCard({
+  project,
+  compact = false,
+}: {
+  project: Project;
+  compact?: boolean;
+}) {
   return (
-    <section id="projects" className="relative z-10 section-spacing">
-      <div className="section-container">
-        <div className="section-header">
+    <motion.a
+      key={project.title}
+      href={project.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45 }}
+      className="glass-card overflow-hidden group cursor-pointer block project-card"
+    >
+      <div className="h-1 w-full bg-[var(--accent-gradient)]" />
+      <div className={compact ? "project-card-body-mobile" : "project-card-body"}>
+        <h4
+          className={`font-bold text-[var(--text-primary)] ${
+            compact ? "text-base mb-2" : "text-lg mb-4"
+          }`}
+        >
+          {project.title}
+        </h4>
+        <p
+          className={`text-[var(--text-secondary)] leading-relaxed ${
+            compact ? "text-[13px] mb-4" : "text-sm mb-6"
+          }`}
+        >
+          {project.desc}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-xs px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] text-[var(--text-tertiary)] font-medium"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </motion.a>
+  );
+}
+
+export default function Projects() {
+  const [active, setActive] = useState(0);
+
+  const goTo = (next: number) => {
+    setActive((next + projects.length) % projects.length);
+  };
+
+  return (
+    <section id="projects" className="project-section relative z-10">
+      <div className="section-container w-full">
+        <div className="section-header project-mobile-header">
           <p className="overline">我的项目</p>
           <h3>
             最近在做的<span className="gradient-text">东西</span>
           </h3>
-          <p>
-            这里放了我做的一些项目，虽然不多，但每个都用心做了。
-          </p>
+          <p>这里放了我做的一些项目，虽然不多，但每个都用心做了。</p>
         </div>
 
-        <div className="flex justify-center">
+        <div className="hidden md:flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
-            {projects.map((p, i) => (
-              <motion.a
-                key={p.title}
-                href={p.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="glass-card overflow-hidden group cursor-pointer p-0 block"
-                style={{ perspective: "1000px" }}
-              >
-                <div className="h-1 w-full bg-[var(--accent-gradient)]" />
-                <div className="p-8">
-                  <h4 className="text-lg font-bold text-[var(--text-primary)] mb-4">{p.title}</h4>
-                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">{p.desc}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {p.tags.map((t) => (
-                      <span key={t} className="text-xs px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] text-[var(--text-tertiary)] font-medium">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.a>
+            {projects.map((project) => (
+              <ProjectCard key={project.title} project={project} />
             ))}
+          </div>
+        </div>
+
+        <div className="md:hidden">
+          <ProjectCard key={active} project={projects[active]} compact />
+
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => goTo(active - 1)}
+              className="project-nav-btn"
+              aria-label="上一个项目"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+
+            <div className="flex items-center gap-2">
+              {projects.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setActive(index)}
+                  className={`project-dot ${active === index ? "active" : ""}`}
+                  aria-label={`查看第 ${index + 1} 个项目`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => goTo(active + 1)}
+              className="project-nav-btn"
+              aria-label="下一个项目"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

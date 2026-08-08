@@ -18,7 +18,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative z-10 flex w-full items-center justify-center px-4 py-6"
+      className="relative z-10 flex w-full items-center justify-center px-3 py-2 md:px-4 md:py-6"
     >
       <motion.div
         initial={{ opacity: 0, y: 26, scale: 0.97 }}
@@ -27,40 +27,40 @@ export default function About() {
         className="boarding-frame w-full max-w-[860px]"
       >
         <div className="boarding-pass w-full">
-          <div className="relative z-10 px-6 py-7 sm:px-12 sm:py-10">
+          <div className="relative z-10 px-4 py-5 sm:px-12 sm:py-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--text-tertiary)]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--text-tertiary)] sm:text-[11px]">
                 Boarding Pass / 登机牌
               </p>
-              <h3 className="mt-2 text-3xl font-bold gradient-text sm:text-4xl">
+              <h3 className="mt-2 text-2xl font-bold gradient-text sm:text-4xl">
                 人生航班
               </h3>
             </div>
             <div className="text-right">
-              <p className="text-[11px] tracking-[0.2em] text-[var(--text-tertiary)]">
+              <p className="text-[10px] tracking-[0.2em] text-[var(--text-tertiary)] sm:text-[11px]">
                 Airbus 350-1000
               </p>
               <span className="boarding-stamp">LIFE / 人生</span>
             </div>
           </div>
 
-          <div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-3 sm:mt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
             <div className="flex items-center gap-4">
               <img
                 src="/site-icon.png"
                 alt="Airbus 350-1000 头像"
-                className="h-16 w-16 rounded-full object-cover shadow-[0_10px_24px_rgba(0,0,0,0.18)] ring-1 ring-white/40 sm:h-20 sm:w-20"
+                className="h-14 w-14 rounded-full object-cover shadow-[0_10px_24px_rgba(0,0,0,0.18)] ring-1 ring-white/40 sm:h-20 sm:w-20"
               />
               <div>
                 <p className="boarding-field-label">乘客 / Passenger</p>
-                <p className="mt-1 text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
+                <p className="mt-1 text-xl font-bold text-[var(--text-primary)] sm:text-3xl">
                   饶启烨
                 </p>
-                <p className="mt-1 text-sm text-[var(--text-tertiary)]">学生 / 探索者</p>
+                <p className="mt-1 text-xs text-[var(--text-tertiary)] sm:text-sm">学生 / 探索者</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:w-[340px]">
+            <div className="grid grid-cols-2 gap-2.5 sm:w-[340px] sm:gap-4">
               <div className="boarding-field">
                 <span className="boarding-field-label">航班</span>
                 <strong>人生</strong>
@@ -72,7 +72,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-4 sm:gap-4">
             <div className="boarding-field">
               <span className="boarding-field-label">舱位</span>
               <strong>学生</strong>
@@ -91,7 +91,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-2 sm:gap-4">
             <div className="boarding-route">
               <span className="boarding-field-label">出发地</span>
               <strong>校园</strong>
@@ -105,18 +105,18 @@ export default function About() {
 
           <div className="boarding-perforation" />
 
-          <div className="relative z-10 flex flex-col items-center justify-between gap-5 px-6 py-6 sm:flex-row sm:px-12 sm:py-7">
-            <div className="text-center sm:text-left">
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[var(--text-tertiary)]">
+          <div className="relative z-10 flex flex-row items-center justify-between gap-3 px-4 py-4 sm:gap-5 sm:px-12 sm:py-7">
+            <div className="text-left">
+              <p className="hidden text-[11px] uppercase tracking-[0.22em] text-[var(--text-tertiary)] sm:block">
                 RQY · Life Flight · 佛山 → 下一站
               </p>
-              <p className="mt-1 text-base font-semibold text-[var(--text-primary)]">
+              <p className="text-sm font-semibold text-[var(--text-primary)] sm:mt-1 sm:text-base">
                 人生航班正在登机
               </p>
             </div>
             <div className="flex flex-col items-center gap-1">
               <div className="boarding-barcode" aria-hidden="true" />
-              <span className="text-[9px] tracking-[0.18em] text-[var(--text-tertiary)]">
+              <span className="text-[8px] tracking-[0.18em] text-[var(--text-tertiary)] sm:text-[9px]">
                 RQY-2026
               </span>
             </div>
