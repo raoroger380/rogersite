@@ -6,7 +6,7 @@ export default function Signature() {
       <div className="section-container w-full">
         <div className="max-w-md mx-auto">
           <div className="glass-card text-center px-6 py-8 md:px-8 md:py-9">
-            <p className="overline">Signature</p>
+            
             <h3 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mt-1 mb-6">个性签名</h3>
 
             <div className="relative">

@@ -3,9 +3,9 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { label: "AI写代码", value: "2年" },
-  { label: "项目", value: "3" },
-  { label: "技术栈", value: "0" },
+  { label: "年龄", value: "15" },
+  { label: "项目", value: "4" },
+  { label: "访问城市", value: "17" },
 ];
 
 export default function About() {
@@ -18,13 +18,8 @@ export default function About() {
         <div className="section-header mb-8 md:mb-14">
           <p className="overline">关于我</p>
           <h3>
-            一个爱折腾的<span className="gradient-text">学生开发者</span>
+            一个爱自由的<span className="gradient-text">学生</span>
           </h3>
-          <p>
-            我是一名 14 岁的学生，从小就开始对代码感兴趣。
-            从 Scratch 到C++，一路走来学到了很多。
-            喜欢用代码实现自己的想法，也喜欢探索新技术。
-          </p>
         </div>
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 mb-8 md:mb-14">

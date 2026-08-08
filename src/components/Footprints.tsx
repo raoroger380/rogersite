@@ -423,7 +423,7 @@ export default function Footprints() {
             <h3>
               点亮走过的<span className="gradient-text">地方</span>
             </h3>
-            <p>用光点亮我真正去过的城市。</p>
+           
           </div>
 
           <div className="china-map-stage">
@@ -474,7 +474,7 @@ export default function Footprints() {
           <h3>
             点亮走过的<span className="gradient-text">地方</span>
           </h3>
-          <p>用光点亮我真正去过的城市。</p>
+         
         </div>
 
         <div className="lit-cities-row" aria-label="已点亮城市">
