@@ -14,7 +14,22 @@ const VISITED_PLACES = [
   { name: "香港", lon: 114.1694, lat: 22.3193 },
   { name: "北京", lon: 116.4074, lat: 39.9042 },
   { name: "梅州", lon: 116.1225, lat: 24.2886 },
+  { name: "重庆", lon: 106.5516, lat: 29.563 },
+  { name: "武汉", lon: 114.3896, lat: 30.6628 },
+  { name: "长沙", lon: 113.0823, lat: 28.2568 },
+  { name: "宜昌", lon: 111.1707, lat: 30.7617 },
+  { name: "成都", lon: 103.9526, lat: 30.7617 },
+  { name: "咸阳", lon: 108.4131, lat: 34.8706 },
+  { name: "珠海", lon: 113.7305, lat: 22.1155 },
+  { name: "阿坝藏族羌族自治州", lon: 102.4805, lat: 32.4536 },
+  { name: "汕头", lon: 117.1692, lat: 23.3405 },
+  { name: "江门", lon: 112.6318, lat: 22.1484 },
+  { name: "无锡", lon: 120.3442, lat: 31.5527 },
 ];
+
+const VISITED_CITY_LABEL = VISITED_PLACES.map((place) => place.name).join(
+  " · ",
+);
 
 const DETAIL_SCALE = 2.1;
 const CITY_LABEL_SCALE = 3.2;
@@ -444,9 +459,7 @@ export default function Footprints() {
 
         <div className="lit-cities-row" aria-label="已点亮城市">
           <span className="lit-cities-label">已点亮城市</span>
-          <span className="lit-cities-values">
-            佛山 · 广州 · 深圳 · 香港 · 北京 · 梅州
-          </span>
+          <span className="lit-cities-values">{VISITED_CITY_LABEL}</span>
           <span className="map-city-legend" aria-label="城市图例">
             <span className="map-city-legend-item">
               <i className="map-city-legend-dot lit" />
