@@ -1293,6 +1293,8 @@ body {
     flex: 1 1 auto;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
     white-space: nowrap;
   }
