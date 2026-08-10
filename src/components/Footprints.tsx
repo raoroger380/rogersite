@@ -27,10 +27,6 @@ const VISITED_PLACES = [
   { name: "梅州", lon: 116.1225, lat: 24.2886 },
 ];
 
-const VISITED_CITY_LABEL = VISITED_PLACES.map((place) => place.name).join(
-  " · ",
-);
-
 const DETAIL_SCALE = 2.1;
 const CITY_LABEL_SCALE = 3.2;
 const MIN_SCALE = 1;
@@ -479,7 +475,13 @@ export default function Footprints() {
 
         <div className="lit-cities-row" aria-label="已点亮城市">
           <span className="lit-cities-label">已点亮城市</span>
-          <span className="lit-cities-values">{VISITED_CITY_LABEL}</span>
+          <span className="lit-cities-values">
+            {VISITED_PLACES.map((place) => (
+              <span key={place.name} className="lit-city-pill">
+                {place.name}
+              </span>
+            ))}
+          </span>
           <span className="map-city-legend" aria-label="城市图例">
             <span className="map-city-legend-item">
               <i className="map-city-legend-dot lit" />

@@ -52,8 +52,23 @@ function ProjectCard({
     >
       <div className="h-1 w-full bg-[var(--accent-gradient)]" />
       <div className={compact ? "project-card-body-mobile" : "project-card-body"}>
+        <span className="project-card-arrow" aria-hidden="true">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M7 17 17 7" />
+            <path d="M8 7h9v9" />
+          </svg>
+        </span>
         <h4
-          className={`font-bold text-[var(--text-primary)] ${
+          className={`font-bold text-[var(--text-primary)] min-w-0 ${
             compact ? "text-base mb-2" : "text-lg mb-4"
           }`}
         >
@@ -100,7 +115,7 @@ export default function Projects() {
         </div>
 
         <div className="hidden md:flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl">
             {projects.map((project) => (
               <ProjectCard key={project.title} project={project} />
             ))}
