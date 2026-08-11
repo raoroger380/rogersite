@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const PAGE_ORDER = [
   "hero",
   "about",
+  "age",
   "projects",
   "footprints",
   "footprints-album",
