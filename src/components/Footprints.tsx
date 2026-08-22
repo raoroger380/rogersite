@@ -419,7 +419,6 @@ export default function Footprints() {
             <h3>
               点亮走过的<span className="gradient-text">地方</span>
             </h3>
-           
           </div>
 
           <div className="china-map-stage">
@@ -467,10 +466,11 @@ export default function Footprints() {
       <div className="section-container footprints-container">
         <div className="section-header footprints-header">
           <p className="overline">我的足迹</p>
+          <h2>同时我也热爱旅行</h2>
           <h3>
-            点亮走过的<span className="gradient-text">地方</span>
+            用光点点亮走过的<span className="gradient-text">地方</span>
           </h3>
-         
+          
         </div>
 
         <div className="lit-cities-row" aria-label="已点亮城市">
