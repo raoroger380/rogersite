@@ -19,7 +19,7 @@ const hobbies = [
 
 export default function Hobbies() {
   return (
-    <section id="hobbies" className="relative z-10 section-spacing">
+    <section id="hobbies" className="hobbies-section relative z-10 section-spacing">
       <div className="section-container">
         <div className="section-header">
           <p className="overline">爱好</p>
@@ -32,7 +32,7 @@ export default function Hobbies() {
         </div>
 
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+          <div className="hobbies-grid grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
             {hobbies.map((h, i) => (
               <motion.div
                 key={h.name}
@@ -47,12 +47,12 @@ export default function Hobbies() {
                 <div className="h-2 w-full bg-[var(--accent-gradient)]" />
 
                 <div className="flex flex-col items-center text-center">
-                  <span className="text-5xl mt-8 mb-4">{h.emoji}</span>
+                  <span className="hobby-icon text-5xl mt-8 mb-4" aria-hidden="true">{h.emoji}</span>
                   <h4 className="text-xl font-bold text-[var(--text-primary)] mb-3">{h.name}</h4>
-                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed mx-8 mb-6">
+                  <p className="hobby-description text-sm text-[var(--text-secondary)] leading-relaxed mx-8 mb-6">
                     {h.desc}
                   </p>
-                  <div className="flex flex-wrap justify-center gap-2 mb-8">
+                  <div className="hobby-details flex flex-wrap justify-center gap-2 mb-8">
                     {h.details.map((d) => (
                       <span
                         key={d}

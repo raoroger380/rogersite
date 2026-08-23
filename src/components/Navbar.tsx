@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_ITEMS = [
@@ -14,11 +14,20 @@ const NAV_ITEMS = [
 ];
 
 type Theme = "light" | "dark";
+type ThemeTransition = {
+  x: number;
+  y: number;
+  next: Theme;
+};
 
 export default function Navbar() {
   const [active, setActive] = useState("#hero");
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<Theme | null>(null);
+  const [navHidden, setNavHidden] = useState(false);
+  const [themeTransition, setThemeTransition] = useState<ThemeTransition | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const themeTransitionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const updateActive = () => {
@@ -26,11 +35,49 @@ export default function Navbar() {
       const matched = NAV_ITEMS.find((item) => item.ids.includes(hash));
       if (matched) {
         setActive(matched.href);
+        if (matched.href === "#hero") setNavHidden(false);
       }
     };
     updateActive();
     window.addEventListener("hashchange", updateActive);
     return () => window.removeEventListener("hashchange", updateActive);
+  }, []);
+
+  useEffect(() => {
+    const onWheel = (event: WheelEvent) => {
+      if (window.matchMedia("(hover: none), (pointer: coarse)").matches) {
+        return;
+      }
+      if (Math.abs(event.deltaY) < 4) return;
+      setNavHidden(event.deltaY > 0);
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        touchStartY.current = event.touches[0].clientY;
+      }
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (touchStartY.current === null) return;
+      const touchEnd = event.changedTouches[0];
+      const deltaY = touchEnd ? touchEnd.clientY - touchStartY.current : 0;
+      touchStartY.current = null;
+      if (Math.abs(deltaY) < 24) return;
+      // 手指向上滑 = 页面向下切换，收起导航；反向则显示。
+      setNavHidden(deltaY < 0);
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
+    };
   }, []);
 
   useEffect(() => {
@@ -44,16 +91,38 @@ export default function Navbar() {
     window.localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    const layer = themeTransitionRef.current;
+    if (!layer || !themeTransition) return;
+
+    layer.replaceChildren();
+    const background = document.querySelector(".liquid-background")?.cloneNode(true);
+    const page = document.querySelector(".page-viewport")?.cloneNode(true);
+    if (background) layer.appendChild(background);
+    if (page) layer.appendChild(page);
+
+    return () => layer.replaceChildren();
+  }, [themeTransition]);
+
   const activeTheme = theme ?? "dark";
   const scrolled = active !== "#hero";
 
-  const toggleTheme = () => {
+  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (themeTransition) return;
     const next: Theme = activeTheme === "dark" ? "light" : "dark";
-    document.documentElement.classList.add("theme-transition");
-    setTheme(next);
-    window.setTimeout(() => {
-      document.documentElement.classList.remove("theme-transition");
-    }, 700);
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    setThemeTransition({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      next,
+    });
+  };
+
+  const completeThemeTransition = () => {
+    if (!themeTransition) return;
+    setTheme(themeTransition.next);
+    setThemeTransition(null);
   };
 
   const scrollTo = (href: string) => {
@@ -67,7 +136,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`navbar-shell fixed top-0 left-0 right-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
+      <nav className={`navbar-shell fixed top-0 left-0 right-0 z-50 ${scrolled ? "is-scrolled" : ""} ${navHidden ? "is-hidden" : ""}`}>
         <div className="section-container flex items-center justify-between gap-3 md:gap-6">
           <div className="nav-glass-island brand-glass flex shrink-0 items-center">
             <button
@@ -170,6 +239,23 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      {themeTransition && (
+        <div
+          key={`${themeTransition.next}-${themeTransition.x}-${themeTransition.y}`}
+          ref={themeTransitionRef}
+          className="theme-transition-orb"
+          data-transition-theme={themeTransition.next}
+          aria-hidden="true"
+          onAnimationEnd={completeThemeTransition}
+              style={
+                {
+                  "--theme-origin-x": `${themeTransition.x}px`,
+                  "--theme-origin-y": `${themeTransition.y}px`,
+                } as CSSProperties
+              }
+        />
+      )}
 
       <AnimatePresence>
         {menuOpen && (

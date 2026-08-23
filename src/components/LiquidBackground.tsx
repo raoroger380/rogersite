@@ -28,6 +28,16 @@ type BlobState = {
   scrollFactor: number;
 };
 
+type ParticleState = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  alpha: number;
+  phase: number;
+};
+
 export default function LiquidBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +55,8 @@ export default function LiquidBackground() {
       "(hover: hover) and (pointer: fine)",
     ).matches;
     const cursorLight = root.querySelector<HTMLDivElement>("[data-cursor-light]");
+    const particleCanvas = root.querySelector<HTMLCanvasElement>("[data-particle-canvas]");
+    const particleContext = particleCanvas?.getContext("2d");
 
     const blobs: BlobState[] = nodes.map((node, index) => {
       const size = 260 + (index % 3) * 110 + ((index * 41) % 90);
@@ -77,6 +89,105 @@ export default function LiquidBackground() {
     let scrollVelocity = 0;
     let raf = 0;
     let time = Math.random() * 100;
+    let pointerActive = false;
+    let pointerSpeed = 0;
+    let previousPointerX = mouseX;
+    let previousPointerY = mouseY;
+    let canvasWidth = window.innerWidth;
+    let canvasHeight = window.innerHeight;
+    let canvasDpr = 1;
+    let particleColor = "155, 182, 196";
+
+    const particles: ParticleState[] = [];
+
+    const refreshParticleTheme = () => {
+      const accentRgb = getComputedStyle(document.documentElement)
+        .getPropertyValue("--accent-rgb")
+        .trim();
+      if (accentRgb) particleColor = accentRgb;
+    };
+
+    const resizeParticleCanvas = () => {
+      if (!particleCanvas || !particleContext) return;
+      canvasWidth = window.innerWidth;
+      canvasHeight = window.innerHeight;
+      canvasDpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      particleCanvas.width = Math.floor(canvasWidth * canvasDpr);
+      particleCanvas.height = Math.floor(canvasHeight * canvasDpr);
+      particleCanvas.style.width = `${canvasWidth}px`;
+      particleCanvas.style.height = `${canvasHeight}px`;
+      particleContext.setTransform(canvasDpr, 0, 0, canvasDpr, 0, 0);
+    };
+
+    const createParticles = () => {
+      const count = Math.min(
+        54,
+        Math.max(42, Math.round((canvasWidth * canvasHeight) / 19000)),
+      );
+      particles.length = 0;
+      for (let index = 0; index < count; index += 1) {
+        particles.push({
+          x: Math.random() * canvasWidth,
+          y: Math.random() * canvasHeight,
+          vx: (Math.random() - 0.5) * 0.12,
+          vy: (Math.random() - 0.5) * 0.12,
+          size: 1.15 + Math.random() * 2.1,
+          alpha: 0.22 + Math.random() * 0.2,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+    };
+
+    const drawParticles = () => {
+      if (!particleContext) return;
+      particleContext.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      particles.forEach((particle) => {
+        const dx = mouseX - particle.x;
+        const dy = mouseY - particle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const proximity = pointerActive && distance < 320
+          ? 1 - distance / 320
+          : 0;
+        const pulse = 0.82 + Math.sin(time * 0.8 + particle.phase) * 0.18;
+        const alpha = particle.alpha * pulse + proximity * 0.14;
+
+        if (pointerActive && pointerSpeed > 0.4 && proximity > 0.02) {
+          particleContext.beginPath();
+          particleContext.moveTo(
+            particle.x - particle.vx * 22,
+            particle.y - particle.vy * 22,
+          );
+          particleContext.lineTo(particle.x, particle.y);
+          const trailStrength = Math.min(1, pointerSpeed / 24);
+          particleContext.strokeStyle = `rgba(${particleColor}, ${Math.min(0.16, alpha * 0.8 * trailStrength)})`;
+          particleContext.lineWidth = Math.max(0.5, particle.size * 0.55);
+          particleContext.stroke();
+        }
+
+        particleContext.beginPath();
+        particleContext.arc(
+          particle.x,
+          particle.y,
+          particle.size * 2.6 + proximity * 1.2,
+          0,
+          Math.PI * 2,
+        );
+        particleContext.fillStyle = `rgba(${particleColor}, ${Math.min(0.12, alpha * 0.22)})`;
+        particleContext.fill();
+
+        particleContext.beginPath();
+        particleContext.arc(
+          particle.x,
+          particle.y,
+          particle.size + proximity * 0.7,
+          0,
+          Math.PI * 2,
+        );
+        particleContext.fillStyle = `rgba(${particleColor}, ${Math.min(0.48, alpha)})`;
+        particleContext.fill();
+      });
+    };
 
     const getPageDepth = () => {
       const hash = window.location.hash.replace(/^#/, "");
@@ -105,29 +216,66 @@ export default function LiquidBackground() {
 
     placeInitialBlobs();
 
-    if (prefersReducedMotion) {
+    // 触摸设备没有指针反馈，继续跑每帧的磁场/滚动计算只会增加合成压力。
+    // 移动端保留 CSS blob 形变即可，避免 iOS/Android 在 backdrop-filter 上闪烁。
+    if (!finePointer) {
       if (cursorLight) cursorLight.remove();
+      if (particleCanvas) particleCanvas.style.display = "none";
       return;
     }
+
+    if (!particleCanvas || !particleContext) return;
+
+    particleCanvas.style.display = "block";
+    resizeParticleCanvas();
+    createParticles();
+    refreshParticleTheme();
+
+    const themeObserver = new MutationObserver(refreshParticleTheme);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
 
     const onHashChange = () => {
       scrollTarget = getPageDepth();
     };
 
-    const onWheel = (event: WheelEvent) => {
-      scrollVelocity += event.deltaY * 0.00022;
-      scrollVelocity = Math.max(-0.18, Math.min(0.18, scrollVelocity));
-    };
-
     const onPointerMove = (event: PointerEvent) => {
+      const deltaX = event.clientX - previousPointerX;
+      const deltaY = event.clientY - previousPointerY;
       mouseX = event.clientX;
       mouseY = event.clientY;
+      previousPointerX = mouseX;
+      previousPointerY = mouseY;
+      pointerSpeed = Math.min(70, Math.sqrt(deltaX * deltaX + deltaY * deltaY));
+      pointerActive = true;
+
+      // 位置更新时立即给附近粒子一个小冲量，不等待多帧累积排斥力。
+      const impulseRadius = 360;
+      const impulseStrength = prefersReducedMotion ? 0.72 : 1.08;
+      particles.forEach((particle) => {
+        const awayX = particle.x - mouseX;
+        const awayY = particle.y - mouseY;
+        const distance = Math.sqrt(awayX * awayX + awayY * awayY);
+        if (distance < impulseRadius && distance > 0.01) {
+          const proximity = 1 - distance / impulseRadius;
+          const impulse = proximity * proximity * impulseStrength;
+          particle.vx += (awayX / distance) * impulse;
+          particle.vy += (awayY / distance) * impulse;
+        }
+      });
+    };
+
+    const onPointerLeave = () => {
+      pointerActive = false;
     };
 
     const animate = () => {
       time += 0.008;
       const width = window.innerWidth;
       const height = window.innerHeight;
+      pointerSpeed *= 0.9;
 
       scrollVelocity += (scrollTarget - scrollCurrent) * 0.014;
       scrollVelocity *= 0.91;
@@ -136,7 +284,7 @@ export default function LiquidBackground() {
       cursorX += (mouseX - cursorX) * 0.07;
       cursorY += (mouseY - cursorY) * 0.07;
       if (finePointer && cursorLight) {
-        cursorLight.style.opacity = "1";
+        cursorLight.style.opacity = pointerActive ? "1" : "0";
         cursorLight.style.transform = `translate3d(${cursorX - 140}px, ${cursorY - 140}px, 0)`;
       }
 
@@ -155,11 +303,12 @@ export default function LiquidBackground() {
         let influenceY = 0;
         let proximity = 0;
 
-        if (finePointer && dist < 380 && dist > 0.01) {
-          const strength = (1 - dist / 380) * 0.34;
-          influenceX = (dx / dist) * strength * 48;
-          influenceY = (dy / dist) * strength * 48;
-          proximity = (1 - dist / 380) * 0.07;
+        if (finePointer && pointerActive && dist < 420 && dist > 0.01) {
+          const normalizedDistance = 1 - dist / 420;
+          const strength = normalizedDistance * normalizedDistance * 0.24;
+          influenceX = (dx / dist) * strength * 58;
+          influenceY = (dy / dist) * strength * 58;
+          proximity = normalizedDistance * 0.08;
         }
 
         state.vx += (targetX + influenceX - state.x) * 0.032;
@@ -177,22 +326,49 @@ export default function LiquidBackground() {
         );
       });
 
+      particles.forEach((particle) => {
+        const dx = mouseX - particle.x;
+        const dy = mouseY - particle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (pointerActive && distance < 360 && distance > 0.01) {
+          const proximity = 1 - distance / 360;
+          const repulsion = proximity * proximity * (prefersReducedMotion ? 0.034 : 0.058);
+          particle.vx -= (dx / distance) * repulsion;
+          particle.vy -= (dy / distance) * repulsion;
+        }
+
+        particle.vx += Math.sin(time * 0.42 + particle.phase) * 0.0018;
+        particle.vy += Math.cos(time * 0.36 + particle.phase * 1.3) * 0.0018;
+        particle.vx *= 0.988;
+        particle.vy *= 0.988;
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+
+        if (particle.x < -24) particle.x = canvasWidth + 24;
+        if (particle.x > canvasWidth + 24) particle.x = -24;
+        if (particle.y < -24) particle.y = canvasHeight + 24;
+        if (particle.y > canvasHeight + 24) particle.y = -24;
+      });
+
+      drawParticles();
+
       raf = requestAnimationFrame(animate);
     };
 
     scrollTarget = getPageDepth();
     window.addEventListener("hashchange", onHashChange);
-    window.addEventListener("wheel", onWheel, { passive: true });
-    if (finePointer) {
-      window.addEventListener("pointermove", onPointerMove, { passive: true });
-    }
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    window.addEventListener("resize", resizeParticleCanvas, { passive: true });
     raf = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(raf);
+      themeObserver.disconnect();
       window.removeEventListener("hashchange", onHashChange);
-      window.removeEventListener("wheel", onWheel);
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerleave", onPointerLeave);
+      window.removeEventListener("resize", resizeParticleCanvas);
     };
   }, []);
 
@@ -206,6 +382,11 @@ export default function LiquidBackground() {
           className={`liquid-blob liquid-blob-${index + 1}`}
         />
       ))}
+      <canvas
+        className="liquid-particle-canvas"
+        data-particle-canvas
+        aria-hidden="true"
+      />
       <div className="liquid-ambient-light" />
       <div className="liquid-noise" />
       <div className="cursor-ambient-light" data-cursor-light />

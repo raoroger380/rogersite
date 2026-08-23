@@ -36,7 +36,10 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
   const navigateTo = (nextIndex: number, triggerFlight: boolean) => {
     if (nextIndex < 0 || nextIndex >= PAGE_ORDER.length) return;
 
-    const enableFlight = triggerFlight && !reduceMotion;
+    const enableFlight =
+      triggerFlight &&
+      !reduceMotion &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     transitionLock.current = true;
     window.location.hash = `#${PAGE_ORDER[nextIndex]}`;
     window.setTimeout(() => {
@@ -211,7 +214,7 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
           className="page-screen"
           initial={
             contentVisible
-              ? { opacity: 0, y: reduceMotion ? 0 : 80 * direction }
+              ? { opacity: 0, y: reduceMotion ? 0 : 64 * direction }
               : { opacity: 1, y: 0 }
           }
           animate={{
@@ -220,12 +223,12 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
           }}
           exit={
             contentVisible
-              ? { opacity: 0, y: reduceMotion ? 0 : -80 * direction }
+              ? { opacity: 0, y: reduceMotion ? 0 : -64 * direction }
               : { opacity: 0, y: 0, transition: { duration: 0.1 } }
           }
           transition={{
-            duration: reduceMotion ? 0.01 : contentVisible ? 0.5 : 0.42,
-            ease: [0.22, 0.61, 0.36, 1],
+            duration: reduceMotion ? 0.24 : contentVisible ? 0.76 : 0.58,
+            ease: [0.16, 1, 0.3, 1],
           }}
         >
           {pages[page]}
