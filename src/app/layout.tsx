@@ -35,7 +35,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" data-theme="dark" className={`${inter.variable}`}>
+    <html
+      lang="zh-CN"
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`${inter.variable}`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body style={{ fontFamily: "var(--font-inter), sans-serif" }}>
         {children}
       </body>

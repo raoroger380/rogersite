@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import A350FlightTransition from "@/components/A350FlightTransition";
 
 const PAGE_ORDER = [
@@ -17,6 +17,7 @@ const PAGE_ORDER = [
 ];
 
 export default function PageNavigator({ pages }: { pages: Record<string, ReactNode> }) {
+  const reduceMotion = useReducedMotion();
   const [page, setPage] = useState("hero");
   const [direction, setDirection] = useState(1);
   const previousIndex = useRef(0);
@@ -35,11 +36,12 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
   const navigateTo = (nextIndex: number, triggerFlight: boolean) => {
     if (nextIndex < 0 || nextIndex >= PAGE_ORDER.length) return;
 
+    const enableFlight = triggerFlight && !reduceMotion;
     transitionLock.current = true;
     window.location.hash = `#${PAGE_ORDER[nextIndex]}`;
     window.setTimeout(() => {
       transitionLock.current = false;
-    }, triggerFlight ? 2600 : 700);
+    }, enableFlight ? 2600 : 700);
   };
 
   const handleFlightComplete = () => {
@@ -81,7 +83,7 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
         window.clearTimeout(flightTimerRef.current);
       }
 
-      if (previousIndex.current === 0 && nextIndex === 1) {
+      if (previousIndex.current === 0 && nextIndex === 1 && !reduceMotion) {
         setContentVisible(false);
         pendingPageRef.current = next;
         window.clearTimeout(flightTimerRef.current);
@@ -102,7 +104,7 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
       window.removeEventListener("hashchange", resolvePage);
       window.clearTimeout(flightTimerRef.current);
     };
-  }, []);
+  }, [reduceMotion]);
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -198,7 +200,7 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
       window.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, []);
+  }, [reduceMotion]);
 
   return (
     <main className="page-viewport">
@@ -207,18 +209,22 @@ export default function PageNavigator({ pages }: { pages: Record<string, ReactNo
         <motion.section
           key={page}
           className="page-screen"
-          initial={contentVisible ? { opacity: 0, y: 80 * direction } : { opacity: 1, y: 0 }}
+          initial={
+            contentVisible
+              ? { opacity: 0, y: reduceMotion ? 0 : 80 * direction }
+              : { opacity: 1, y: 0 }
+          }
           animate={{
             opacity: contentVisible ? 1 : 0,
             y: contentVisible ? 0 : -36,
           }}
           exit={
             contentVisible
-              ? { opacity: 0, y: -80 * direction }
+              ? { opacity: 0, y: reduceMotion ? 0 : -80 * direction }
               : { opacity: 0, y: 0, transition: { duration: 0.1 } }
           }
           transition={{
-            duration: contentVisible ? 0.5 : 0.42,
+            duration: reduceMotion ? 0.01 : contentVisible ? 0.5 : 0.42,
             ease: [0.22, 0.61, 0.36, 1],
           }}
         >

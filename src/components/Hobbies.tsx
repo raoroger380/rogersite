@@ -40,8 +40,9 @@ export default function Hobbies() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.5, delay: i * 0.15 }}
-                className="glass-card overflow-hidden"
+                className="glass-card hobby-card overflow-hidden"
               >
+                <div className="hobby-aura" aria-hidden="true" />
                 {/* 顶部色条 */}
                 <div className="h-2 w-full bg-[var(--accent-gradient)]" />
 

@@ -19,7 +19,6 @@ export default function Navbar() {
   const [active, setActive] = useState("#hero");
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<Theme | null>(null);
-  const [navbarHidden, setNavbarHidden] = useState(false);
 
   useEffect(() => {
     const updateActive = () => {
@@ -40,49 +39,22 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const onWheel = (event: WheelEvent) => {
-      if (event.deltaY > 0) {
-        setNavbarHidden(true);
-        setMenuOpen(false);
-      } else if (event.deltaY < 0) {
-        setNavbarHidden(false);
-      }
-    };
-    window.addEventListener("wheel", onWheel, { passive: true });
-
-    let touchStartY = 0;
-    const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1) return;
-      touchStartY = event.touches[0].clientY;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      if (event.touches.length !== 1) return;
-      const deltaY = event.touches[0].clientY - touchStartY;
-      if (Math.abs(deltaY) < 14) return;
-      if (deltaY > 0) {
-        setNavbarHidden(false);
-      } else {
-        setNavbarHidden(true);
-        setMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!theme) return;
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem("theme", theme);
   }, [theme]);
 
   const activeTheme = theme ?? "dark";
+  const scrolled = active !== "#hero";
+
+  const toggleTheme = () => {
+    const next: Theme = activeTheme === "dark" ? "light" : "dark";
+    document.documentElement.classList.add("theme-transition");
+    setTheme(next);
+    window.setTimeout(() => {
+      document.documentElement.classList.remove("theme-transition");
+    }, 700);
+  };
 
   const scrollTo = (href: string) => {
     setMenuOpen(false);
@@ -95,12 +67,7 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
-        initial={false}
-        animate={{ y: navbarHidden ? -120 : 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 0.61, 0.36, 1] }}
-        className="navbar-shell fixed top-0 left-0 right-0 z-50"
-      >
+      <nav className={`navbar-shell fixed top-0 left-0 right-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
         <div className="section-container flex items-center justify-between gap-3 md:gap-6">
           <div className="nav-glass-island brand-glass flex shrink-0 items-center">
             <button
@@ -148,7 +115,7 @@ export default function Navbar() {
           <div className="ml-auto flex shrink-0 items-center gap-3 md:ml-0">
             <div className="nav-glass-island theme-glass inline-flex items-center p-1.5">
               <button
-                onClick={() => setTheme((current) => ((current ?? "light") === "dark" ? "light" : "dark"))}
+                onClick={toggleTheme}
                 className="theme-switch relative inline-flex h-9 w-[74px] items-center justify-between text-[var(--text-tertiary)]"
                 aria-label={`切换到${activeTheme === "dark" ? "浅色" : "深色"}模式`}
                 type="button"
@@ -202,7 +169,7 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       <AnimatePresence>
         {menuOpen && (

@@ -32,7 +32,8 @@ export default function Contact() {
 
   return (
     <section id="contact" className="relative z-10 section-spacing">
-      <div className="section-container">
+      <div className="contact-shell">
+        <div className="section-container">
         <div className="section-header">
           <p className="overline">找到我</p>
           <h3>
@@ -101,12 +102,13 @@ export default function Contact() {
           {["🎮 酸角洲", "🧳旅行", "🎵 听歌", "🖇 写代码", "📎 学习", "♠ 蜜雪"].map((tag) => (
             <span
               key={tag}
-              className="text-sm px-4 py-2 rounded-full border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-glow)] hover:text-[var(--text-primary)] hover:bg-[var(--tag-hover)] transition-all duration-300 cursor-default"
+              className="interest-tag text-sm px-4 py-2 rounded-full border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:border-[var(--border-glow)] hover:text-[var(--text-primary)] hover:bg-[var(--tag-hover)] transition-all duration-300 cursor-default"
             >
               {tag}
             </span>
           ))}
         </motion.div>
+        </div>
       </div>
     </section>
   );

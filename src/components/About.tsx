@@ -8,6 +8,12 @@ const stats = [
   { label: "访问城市", value: "17" },
 ];
 
+const recent = [
+  { label: "最近在写", value: "班级网站" },
+  { label: "最近在玩", value: "VEX 机器人" },
+  { label: "最近在做", value: "生日贺卡" },
+];
+
 export default function About() {
   return (
     <section
@@ -64,6 +70,15 @@ export default function About() {
               <div className="text-2xl font-bold gradient-text mb-2">{s.value}</div>
               <div className="text-sm text-[var(--text-tertiary)]">{s.label}</div>
             </motion.div>
+          ))}
+        </div>
+
+        <div className="recent-row" aria-label="最近动态">
+          {recent.map((item) => (
+            <span key={item.label} className="recent-chip">
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+            </span>
           ))}
         </div>
       </div>

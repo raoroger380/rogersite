@@ -1,6 +1,6 @@
-﻿import ParticleBackground from "@/components/ParticleBackground";
+import LiquidBackground from "@/components/LiquidBackground";
+import GlassPointer from "@/components/GlassPointer";
 import Navbar from "@/components/Navbar";
-import ScrollProgress from "@/components/ScrollProgress";
 import PageNavigator from "@/components/PageNavigator";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -27,8 +27,8 @@ const PAGES = {
 export default function Home() {
   return (
     <>
-      <ParticleBackground />
-      <ScrollProgress />
+      <LiquidBackground />
+      <GlassPointer />
       <Navbar />
       <PageNavigator pages={PAGES} />
     </>
