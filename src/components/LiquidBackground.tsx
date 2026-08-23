@@ -51,9 +51,9 @@ export default function LiquidBackground() {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const finePointer = window.matchMedia(
-      "(hover: hover) and (pointer: fine)",
-    ).matches;
+    const finePointer =
+      window.innerWidth >= 768 &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const cursorLight = root.querySelector<HTMLDivElement>("[data-cursor-light]");
     const particleCanvas = root.querySelector<HTMLCanvasElement>("[data-particle-canvas]");
     const particleContext = particleCanvas?.getContext("2d");
@@ -120,10 +120,13 @@ export default function LiquidBackground() {
     };
 
     const createParticles = () => {
-      const count = Math.min(
-        54,
-        Math.max(42, Math.round((canvasWidth * canvasHeight) / 19000)),
-      );
+      const compactViewport = !finePointer || canvasWidth < 768;
+      const count = compactViewport
+        ? 24
+        : Math.min(
+            54,
+            Math.max(42, Math.round((canvasWidth * canvasHeight) / 19000)),
+          );
       particles.length = 0;
       for (let index = 0; index < count; index += 1) {
         particles.push({
@@ -131,8 +134,12 @@ export default function LiquidBackground() {
           y: Math.random() * canvasHeight,
           vx: (Math.random() - 0.5) * 0.12,
           vy: (Math.random() - 0.5) * 0.12,
-          size: 1.15 + Math.random() * 2.1,
-          alpha: 0.22 + Math.random() * 0.2,
+          size: compactViewport
+            ? 1.5 + Math.random() * 2.2
+            : 1.15 + Math.random() * 2.1,
+          alpha: compactViewport
+            ? 0.34 + Math.random() * 0.24
+            : 0.22 + Math.random() * 0.2,
           phase: Math.random() * Math.PI * 2,
         });
       }
@@ -216,14 +223,6 @@ export default function LiquidBackground() {
 
     placeInitialBlobs();
 
-    // 触摸设备没有指针反馈，继续跑每帧的磁场/滚动计算只会增加合成压力。
-    // 移动端保留 CSS blob 形变即可，避免 iOS/Android 在 backdrop-filter 上闪烁。
-    if (!finePointer) {
-      if (cursorLight) cursorLight.remove();
-      if (particleCanvas) particleCanvas.style.display = "none";
-      return;
-    }
-
     if (!particleCanvas || !particleContext) return;
 
     particleCanvas.style.display = "block";
@@ -231,11 +230,27 @@ export default function LiquidBackground() {
     createParticles();
     refreshParticleTheme();
 
-    const themeObserver = new MutationObserver(refreshParticleTheme);
+    const themeObserver = new MutationObserver(() => {
+      refreshParticleTheme();
+      if (!finePointer) drawParticles();
+    });
     themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-theme"],
     });
+
+    // 触摸设备只绘制一帧低密度装饰粒子，不启动 RAF、指针物理或光晕跟随。
+    // 这样移动端能保留一点空间层次，同时避免主题切换和 backdrop-filter 叠加闪烁。
+    if (!finePointer) {
+      if (cursorLight) cursorLight.remove();
+      drawParticles();
+      window.addEventListener("resize", resizeParticleCanvas, { passive: true });
+
+      return () => {
+        themeObserver.disconnect();
+        window.removeEventListener("resize", resizeParticleCanvas);
+      };
+    }
 
     const onHashChange = () => {
       scrollTarget = getPageDepth();

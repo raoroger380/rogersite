@@ -2,9 +2,9 @@
 
 :root {
   color-scheme: light;
-  --bg-primary: #f4f1ec;
-  --bg-secondary: #ebe6df;
-  --bg-tertiary: #e1dcd2;
+  --bg-primary: #ffffff;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #ffffff;
   --accent: #477b89;
   --accent-soft: #6f9aa6;
   --accent-rgb: 71, 123, 137;
@@ -50,9 +50,9 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg-primary: #0f1218;
-  --bg-secondary: #161a22;
-  --bg-tertiary: #20262f;
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --bg-tertiary: #000000;
   --accent: #9bb6c4;
   --accent-soft: #cbd6df;
   --accent-rgb: 155, 182, 196;
@@ -2769,6 +2769,54 @@ body {
    pointer while using responsive emulation. */
 @media (max-width: 767px) {
   .liquid-particle-canvas {
+    display: block !important;
+    opacity: 0.64;
+    filter: none;
+  }
+}
+
+/* ===== Monochrome background field =====
+   Keep the page surface pure black or white. The accent is reserved for the
+   intentionally sparse particle layer, so glass surfaces and text remain the
+   visual hierarchy instead of competing with a full-screen gradient. */
+html,
+body {
+  background-color: var(--bg-primary) !important;
+}
+
+.liquid-background,
+.theme-transition-orb > .liquid-background {
+  background: var(--bg-primary) !important;
+}
+
+.liquid-background .liquid-atmosphere,
+.liquid-background .liquid-blob,
+.liquid-background .liquid-ambient-light,
+.liquid-background .liquid-noise {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+.liquid-particle-canvas {
+  display: block !important;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.24));
+}
+
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
+  html,
+  body,
+  .liquid-background {
+    transition: none !important;
+  }
+
+  .liquid-particle-canvas {
+    display: block !important;
+    opacity: 0.64;
+    filter: none;
+  }
+
+  .liquid-background .cursor-ambient-light {
     display: none !important;
   }
 }
@@ -2809,7 +2857,9 @@ body {
 
 @media (max-width: 767px), (hover: none), (pointer: coarse) {
   .liquid-particle-canvas {
-    display: none !important;
+    display: block !important;
+    opacity: 0.64;
+    filter: none;
   }
 
   .liquid-background .cursor-ambient-light {
@@ -3128,9 +3178,9 @@ body {
 }
 
 .theme-transition-orb[data-transition-theme="light"] {
-  --bg-primary: #f4f1ec;
-  --bg-secondary: #ebe6df;
-  --bg-tertiary: #e1dcd2;
+  --bg-primary: #ffffff;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #ffffff;
   --accent: #477b89;
   --accent-soft: #6f9aa6;
   --accent-rgb: 71, 123, 137;
@@ -3157,9 +3207,9 @@ body {
 }
 
 .theme-transition-orb[data-transition-theme="dark"] {
-  --bg-primary: #0f1218;
-  --bg-secondary: #161a22;
-  --bg-tertiary: #20262f;
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --bg-tertiary: #000000;
   --accent: #9bb6c4;
   --accent-soft: #cbd6df;
   --accent-rgb: 155, 182, 196;
@@ -3337,7 +3387,9 @@ body {
 /* Final narrow viewport guard for responsive browser emulation. */
 @media (max-width: 767px) {
   .liquid-particle-canvas {
-    display: none !important;
+    display: block !important;
+    opacity: 0.64;
+    filter: none;
   }
 }
 
@@ -3743,6 +3795,8 @@ body {
 /* Final narrow viewport guard for responsive browser emulation. */
 @media (max-width: 767px) {
   .liquid-particle-canvas {
-    display: none !important;
+    display: block !important;
+    opacity: 0.64;
+    filter: none;
   }
 }
