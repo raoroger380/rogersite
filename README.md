@@ -131,15 +131,15 @@ npx wrangler pages deploy out --project-name=<你的 Pages 项目名>
 
 ### 一键推送
 
-Windows 下双击 `push.bat` 会依次执行：
+Windows 下双击 `push.bat` 会自动把当前分支的全部改动提交并推送到 GitHub：
 
 ```text
 git add -A
-git commit -m "Update"
-git push origin master
+git commit -m "Update website"
+git push origin <当前分支>
 ```
 
-如果工作区没有新改动，脚本会提示：
+也可以传入自定义提交说明，例如 `push.bat "更新首页文案"`。如果工作区没有新改动，脚本会提示：
 
 ```text
 No changes to commit. Working tree is clean.
