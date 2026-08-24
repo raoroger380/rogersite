@@ -9,9 +9,9 @@ const stats = [
 ];
 
 const recent = [
-  { label: "最近在写", value: "班级网站" },
-  { label: "最近在玩", value: "VEX 机器人" },
-  { label: "最近在做", value: "生日贺卡" },
+  { label: "最近在写", value: "作业" },
+  { label: "最近在玩", value: "VEX机器人" },
+  { label: "最近在", value: "学校" },
 ];
 
 export default function About() {
@@ -46,12 +46,11 @@ export default function About() {
             className="max-w-xl space-y-4 text-sm text-[var(--text-secondary)] leading-relaxed md:space-y-5 md:text-base md:leading-loose"
           >
             <p>
-              大家好！我是饶启烨，一名热爱编程的初中生。我在 2024 年开始接触编程，
-              从最初的 C++ 开发到现在的 Web 开发，编程已经成为我生活中不可或缺的一部分。
+              大家好！我是饶启烨，一名热爱自由与创造的初中生。我在 2024 年开始接触编程，
+              从最初的 Scratch 开发到现在的 Web 开发，编程已经成为我生活中不可或缺的一部分。
             </p>
             <p>
-              除了写代码，我还喜欢打羽毛球、听音乐和打三角洲。我相信技术可以改变世界，
-              而我希望能用自己学到的知识做出一些有意义的东西。
+              除了写代码，我还喜欢打羽毛球、听音乐和打三角洲。我也喜欢到处走走旅行。
             </p>
           </motion.div>
         </div>
