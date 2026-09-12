@@ -30,6 +30,17 @@ const PHOTO_SLOTS = Array.from({ length: 9 }, (_, index) => ({
   ][index],
 }));
 
+const preloadedPhotos = new Map<string, HTMLImageElement>();
+
+function preloadPhoto(src: string) {
+  if (typeof window === "undefined" || preloadedPhotos.has(src)) return;
+
+  const image = new window.Image();
+  image.decoding = "async";
+  image.src = src;
+  preloadedPhotos.set(src, image);
+}
+
 function CameraIcon() {
   return (
     <svg
@@ -102,16 +113,22 @@ export default function FootprintsAlbum() {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null,
   );
+  const [loadedPhotoSrc, setLoadedPhotoSrc] = useState<string | null>(null);
+  const [failedPhotoSrc, setFailedPhotoSrc] = useState<string | null>(null);
   const selectedPhoto =
     selectedPhotoIndex === null ? null : PHOTO_SLOTS[selectedPhotoIndex];
   const selectedPhotoNumber =
     selectedPhotoIndex === null ? 0 : selectedPhotoIndex + 1;
+  const isPhotoLoaded = selectedPhoto?.src === loadedPhotoSrc;
+  const isPhotoFailed = selectedPhoto?.src === failedPhotoSrc;
 
   const goTo = (next: number) => {
     setActive((next + PHOTO_SLOTS.length) % PHOTO_SLOTS.length);
   };
 
   const changeSelectedPhoto = (offset: number) => {
+    setLoadedPhotoSrc(null);
+    setFailedPhotoSrc(null);
     setSelectedPhotoIndex((current) =>
       current === null
         ? null
@@ -120,10 +137,23 @@ export default function FootprintsAlbum() {
   };
 
   const openPhoto = (photo: { id: number }) => {
+    setLoadedPhotoSrc(null);
+    setFailedPhotoSrc(null);
     setSelectedPhotoIndex(
       PHOTO_SLOTS.findIndex((slot) => slot.id === photo.id),
     );
   };
+
+  useEffect(() => {
+    if (selectedPhotoIndex === null) return;
+
+    [1, -1, 2].forEach((offset) => {
+      const nextIndex =
+        (selectedPhotoIndex + offset + PHOTO_SLOTS.length) %
+        PHOTO_SLOTS.length;
+      preloadPhoto(PHOTO_SLOTS[nextIndex].src);
+    });
+  }, [selectedPhotoIndex]);
 
   useEffect(() => {
     if (selectedPhotoIndex === null) return;
@@ -133,6 +163,8 @@ export default function FootprintsAlbum() {
         setSelectedPhotoIndex(null);
       }
       if (event.key === "ArrowLeft") {
+        setLoadedPhotoSrc(null);
+        setFailedPhotoSrc(null);
         setSelectedPhotoIndex((current) =>
           current === null
             ? null
@@ -140,6 +172,8 @@ export default function FootprintsAlbum() {
         );
       }
       if (event.key === "ArrowRight") {
+        setLoadedPhotoSrc(null);
+        setFailedPhotoSrc(null);
         setSelectedPhotoIndex((current) =>
           current === null
             ? null
@@ -330,11 +364,30 @@ export default function FootprintsAlbum() {
                 <path d="M9 6l6 6-6 6" />
               </svg>
             </button>
+            <div
+              className={`photo-lightbox-loading${isPhotoLoaded ? " is-hidden" : ""}${isPhotoFailed ? " is-error" : ""}`}
+              aria-live="polite"
+            >
+              {isPhotoFailed ? (
+                <span>图片加载失败</span>
+              ) : (
+                <span className="photo-lightbox-spinner" aria-hidden="true" />
+              )}
+            </div>
             <img
+              key={selectedPhoto.src}
               src={selectedPhoto.src}
               alt={selectedPhoto.alt}
-              className="photo-lightbox-image"
+              className={`photo-lightbox-image${isPhotoLoaded ? " is-loaded" : ""}`}
               onClick={(event) => event.stopPropagation()}
+              onLoad={() => {
+                setLoadedPhotoSrc(selectedPhoto.src);
+                setFailedPhotoSrc(null);
+              }}
+              onError={() => {
+                setLoadedPhotoSrc(null);
+                setFailedPhotoSrc(selectedPhoto.src);
+              }}
             />
             <div className="photo-lightbox-status" aria-live="polite">
               <strong>{selectedPhoto.alt}</strong>
