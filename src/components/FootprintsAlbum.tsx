@@ -4,17 +4,30 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-const PHOTO_SLOTS = Array.from({ length: 6 }, (_, index) => ({
+const PHOTO_SLOTS = Array.from({ length: 9 }, (_, index) => ({
   id: index + 1,
   src: [
     "/photos/beijing.jpg",
     "/photos/chongqing.jpg",
     "/photos/guangzhou.jpg",
-    "/photos/guangzhou-2.jpg",
+    "/photos/shanghai.jpg",
     "/photos/shenzhen.jpg",
-    "/photos/shenzhen-2.jpg",
+    "/photos/hong-kong.jpg",
+    "/photos/nanjing.jpg",
+    "/photos/suzhou.jpg",
+    "/photos/hangzhou.jpg",
   ][index],
-  alt: ["北京", "重庆", "广州", "广州 2", "深圳", "深圳 2"][index],
+  alt: [
+    "北京",
+    "重庆",
+    "广州",
+    "上海",
+    "深圳",
+    "香港",
+    "南京",
+    "苏州",
+    "杭州",
+  ][index],
 }));
 
 function CameraIcon() {
@@ -42,8 +55,8 @@ function PhotoCard({
   onOpen,
 }: {
   compact?: boolean;
-  photo?: { src: string; alt: string };
-  onOpen?: (photo: { src: string; alt: string }) => void;
+  photo?: { id: number; src: string; alt: string };
+  onOpen?: (photo: { id: number; src: string; alt: string }) => void;
 }) {
   const cardClassName = compact
     ? "album-photo album-photo-compact"
@@ -86,27 +99,58 @@ function PhotoCard({
 
 export default function FootprintsAlbum() {
   const [active, setActive] = useState(0);
-  const [selectedPhoto, setSelectedPhoto] = useState<{
-    src: string;
-    alt: string;
-  } | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null,
+  );
+  const selectedPhoto =
+    selectedPhotoIndex === null ? null : PHOTO_SLOTS[selectedPhotoIndex];
+  const selectedPhotoNumber =
+    selectedPhotoIndex === null ? 0 : selectedPhotoIndex + 1;
 
   const goTo = (next: number) => {
     setActive((next + PHOTO_SLOTS.length) % PHOTO_SLOTS.length);
   };
 
+  const changeSelectedPhoto = (offset: number) => {
+    setSelectedPhotoIndex((current) =>
+      current === null
+        ? null
+        : (current + offset + PHOTO_SLOTS.length) % PHOTO_SLOTS.length,
+    );
+  };
+
+  const openPhoto = (photo: { id: number }) => {
+    setSelectedPhotoIndex(
+      PHOTO_SLOTS.findIndex((slot) => slot.id === photo.id),
+    );
+  };
+
   useEffect(() => {
-    if (!selectedPhoto) return;
+    if (selectedPhotoIndex === null) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setSelectedPhoto(null);
+        setSelectedPhotoIndex(null);
+      }
+      if (event.key === "ArrowLeft") {
+        setSelectedPhotoIndex((current) =>
+          current === null
+            ? null
+            : (current - 1 + PHOTO_SLOTS.length) % PHOTO_SLOTS.length,
+        );
+      }
+      if (event.key === "ArrowRight") {
+        setSelectedPhotoIndex((current) =>
+          current === null
+            ? null
+            : (current + 1) % PHOTO_SLOTS.length,
+        );
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedPhoto]);
+  }, [selectedPhotoIndex]);
 
   return (
     <section id="footprints-album" className="album-section relative z-10">
@@ -124,7 +168,7 @@ export default function FootprintsAlbum() {
             <PhotoCard
               key={slot.id}
               photo={slot}
-              onOpen={setSelectedPhoto}
+              onOpen={openPhoto}
             />
           ))}
         </div>
@@ -142,7 +186,7 @@ export default function FootprintsAlbum() {
               <PhotoCard
                 compact
                 photo={PHOTO_SLOTS[active]}
-                onOpen={setSelectedPhoto}
+                onOpen={openPhoto}
               />
             </motion.div>
           </AnimatePresence>
@@ -213,7 +257,7 @@ export default function FootprintsAlbum() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
-            onClick={() => setSelectedPhoto(null)}
+            onClick={() => setSelectedPhotoIndex(null)}
             onWheel={(event) => event.stopPropagation()}
             onTouchStart={(event) => event.stopPropagation()}
             onTouchMove={(event) => event.stopPropagation()}
@@ -221,8 +265,32 @@ export default function FootprintsAlbum() {
           >
             <button
               type="button"
+              className="photo-lightbox-nav photo-lightbox-prev"
+              onClick={(event) => {
+                event.stopPropagation();
+                changeSelectedPhoto(-1);
+              }}
+              aria-label="上一张照片"
+              title="上一张照片"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              type="button"
               className="photo-lightbox-close"
-              onClick={() => setSelectedPhoto(null)}
+              onClick={() => setSelectedPhotoIndex(null)}
               aria-label="关闭图片"
             >
               <svg
@@ -238,12 +306,42 @@ export default function FootprintsAlbum() {
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
             </button>
+            <button
+              type="button"
+              className="photo-lightbox-nav photo-lightbox-next"
+              onClick={(event) => {
+                event.stopPropagation();
+                changeSelectedPhoto(1);
+              }}
+              aria-label="下一张照片"
+              title="下一张照片"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
             <img
               src={selectedPhoto.src}
               alt={selectedPhoto.alt}
               className="photo-lightbox-image"
               onClick={(event) => event.stopPropagation()}
             />
+            <div className="photo-lightbox-status" aria-live="polite">
+              <strong>{selectedPhoto.alt}</strong>
+              <span>
+                {selectedPhotoNumber} / {PHOTO_SLOTS.length}
+              </span>
+            </div>
           </motion.div>,
           document.body,
         )}

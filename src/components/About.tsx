@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const stats = [
   { label: "年龄", value: "15" },
   { label: "项目", value: "4" },
-  { label: "访问城市", value: "17" },
+  { label: "访问城市", value: "21" },
 ];
 
 const recent = [

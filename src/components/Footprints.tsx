@@ -12,6 +12,7 @@ const VISITED_PLACES = [
   { name: "佛山", lon: 113.1219, lat: 23.0218 },
   { name: "深圳", lon: 114.0579, lat: 22.5431 },
   { name: "香港", lon: 114.1694, lat: 22.3193 },
+  { name: "上海", lon: 121.4737, lat: 31.2304 },
   { name: "重庆", lon: 106.5516, lat: 29.563 },
   { name: "武汉", lon: 114.3896, lat: 30.6628 },
   { name: "长沙", lon: 113.0823, lat: 28.2568 },
@@ -25,7 +26,43 @@ const VISITED_PLACES = [
   { name: "无锡", lon: 120.3442, lat: 31.5527 },
   { name: "北京", lon: 116.4074, lat: 39.9042 },
   { name: "梅州", lon: 116.1225, lat: 24.2886 },
+  { name: "杭州", lon: 120.1551, lat: 30.2741 },
+  { name: "南京", lon: 118.7969, lat: 32.0603 },
+  { name: "苏州", lon: 120.5853, lat: 31.2989 },
 ];
+
+const CITY_STRENGTH_ORDER = [
+  "上海",
+  "北京",
+  "深圳",
+  "重庆",
+  "广州",
+  "香港",
+  "苏州",
+  "成都",
+  "杭州",
+  "武汉",
+  "南京",
+  "无锡",
+  "长沙",
+  "佛山",
+  "宜昌",
+  "珠海",
+  "江门",
+  "汕头",
+  "咸阳",
+  "梅州",
+  "阿坝藏族羌族自治州",
+];
+
+const CITY_STRENGTH_RANK = new Map(
+  CITY_STRENGTH_ORDER.map((name, index) => [name, index]),
+);
+const RANKED_VISITED_PLACES = [...VISITED_PLACES].sort(
+  (a, b) =>
+    (CITY_STRENGTH_RANK.get(a.name) ?? Number.MAX_SAFE_INTEGER) -
+    (CITY_STRENGTH_RANK.get(b.name) ?? Number.MAX_SAFE_INTEGER),
+);
 
 const DETAIL_SCALE = 2.1;
 const CITY_LABEL_SCALE = 3.2;
@@ -167,6 +204,8 @@ export default function Footprints() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const panRef = useRef<HTMLDivElement | null>(null);
   const sliderTrackRef = useRef<HTMLDivElement | null>(null);
+  const citiesScrollRef = useRef<HTMLSpanElement | null>(null);
+  const citiesProgressRef = useRef<HTMLSpanElement | null>(null);
   const isPanning = useRef(false);
   const isSliderDragging = useRef(false);
   const panStart = useRef<{
@@ -245,6 +284,154 @@ export default function Footprints() {
   useEffect(() => {
     zoomedRef.current = zoomed;
   }, [zoomed]);
+
+  useEffect(() => {
+    const scrollElement = citiesScrollRef.current;
+    const progressElement = citiesProgressRef.current;
+    if (!scrollElement || !progressElement || !mapGeometry) return;
+
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const resumeDelay = 1600;
+    const scrollSpeed = 24;
+    const resetDuration = 420;
+    let frameId: number | null = null;
+    let lastFrameTime = 0;
+    let autoScrollCarry = 0;
+    let resumeAt = performance.now() + 900;
+    let isTouching = false;
+    let isResetting = false;
+    let resetStartedAt = 0;
+    let resetStartPosition = 0;
+
+    const getMaxScroll = () =>
+      Math.max(0, scrollElement.scrollWidth - scrollElement.clientWidth);
+
+    const updateProgress = () => {
+      const maxScroll = getMaxScroll();
+      const ratio =
+        maxScroll === 0
+          ? 0
+          : clamp(scrollElement.scrollLeft / maxScroll, 0, 1);
+      progressElement.style.transform = `scaleX(${ratio})`;
+    };
+
+    const animate = (now: number) => {
+      frameId = null;
+
+      if (!mobileQuery.matches) return;
+
+      if (lastFrameTime === 0) lastFrameTime = now;
+      const elapsed = Math.min(now - lastFrameTime, 64);
+      lastFrameTime = now;
+
+      const maxScroll = getMaxScroll();
+      if (maxScroll > 0 && !isTouching && now >= resumeAt) {
+        if (isResetting) {
+          const ratio = clamp(
+            (now - resetStartedAt) / resetDuration,
+            0,
+            1,
+          );
+          const eased = 1 - Math.pow(1 - ratio, 3);
+          scrollElement.scrollLeft = resetStartPosition * (1 - eased);
+          updateProgress();
+
+          if (ratio >= 1) {
+            isResetting = false;
+            resumeAt = now + 700;
+          }
+        } else {
+          const nextPosition =
+            scrollElement.scrollLeft +
+            Math.floor(
+              autoScrollCarry + scrollSpeed * (elapsed / 1000),
+            );
+          const scrollStep = nextPosition - scrollElement.scrollLeft;
+          autoScrollCarry =
+            autoScrollCarry + scrollSpeed * (elapsed / 1000) - scrollStep;
+
+          if (nextPosition >= maxScroll) {
+            scrollElement.scrollLeft = maxScroll;
+            autoScrollCarry = 0;
+            resetStartPosition = maxScroll;
+            resetStartedAt = now;
+            isResetting = true;
+            updateProgress();
+          } else {
+            scrollElement.scrollLeft = nextPosition;
+            updateProgress();
+          }
+        }
+      } else {
+        updateProgress();
+      }
+
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    const startAutoScroll = () => {
+      if (frameId !== null) return;
+      lastFrameTime = performance.now();
+      resumeAt = Math.max(resumeAt, lastFrameTime + 900);
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    const stopAutoScroll = () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+        frameId = null;
+      }
+    };
+
+    const handleTouchStart = () => {
+      isTouching = true;
+      isResetting = false;
+      autoScrollCarry = 0;
+    };
+
+    const handleTouchEnd = () => {
+      isTouching = false;
+      resumeAt = performance.now() + resumeDelay;
+    };
+
+    const handleMediaChange = () => {
+      if (mobileQuery.matches) {
+        updateProgress();
+        startAutoScroll();
+      } else {
+        isTouching = false;
+        isResetting = false;
+        autoScrollCarry = 0;
+        stopAutoScroll();
+        progressElement.style.transform = "scaleX(0)";
+      }
+    };
+
+    scrollElement.addEventListener("scroll", updateProgress, {
+      passive: true,
+    });
+    scrollElement.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    scrollElement.addEventListener("touchend", handleTouchEnd, {
+      passive: true,
+    });
+    scrollElement.addEventListener("touchcancel", handleTouchEnd, {
+      passive: true,
+    });
+    mobileQuery.addEventListener("change", handleMediaChange);
+    updateProgress();
+    if (mobileQuery.matches) startAutoScroll();
+
+    return () => {
+      stopAutoScroll();
+      scrollElement.removeEventListener("scroll", updateProgress);
+      scrollElement.removeEventListener("touchstart", handleTouchStart);
+      scrollElement.removeEventListener("touchend", handleTouchEnd);
+      scrollElement.removeEventListener("touchcancel", handleTouchEnd);
+      mobileQuery.removeEventListener("change", handleMediaChange);
+    };
+  }, [mapGeometry]);
 
   useEffect(() => {
     scaleRef.current = scale;
@@ -475,12 +662,20 @@ export default function Footprints() {
 
         <div className="lit-cities-row" aria-label="已点亮城市">
           <span className="lit-cities-label">已点亮城市</span>
-          <span className="lit-cities-values">
-            {VISITED_PLACES.map((place) => (
-              <span key={place.name} className="lit-city-pill">
-                {place.name}
-              </span>
-            ))}
+          <span className="lit-cities-scroll-area">
+            <span ref={citiesScrollRef} className="lit-cities-values">
+              {RANKED_VISITED_PLACES.map((place) => (
+                <span key={place.name} className="lit-city-pill">
+                  {place.name}
+                </span>
+              ))}
+            </span>
+            <span className="lit-cities-scroll-track" aria-hidden="true">
+              <span
+                ref={citiesProgressRef}
+                className="lit-cities-scroll-progress"
+              />
+            </span>
           </span>
           <span className="map-city-legend" aria-label="城市图例">
             <span className="map-city-legend-item">

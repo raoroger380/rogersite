@@ -1119,6 +1119,12 @@ body {
   line-height: 1.6;
   color: var(--text-primary);
 }
+.lit-cities-scroll-area {
+  display: contents;
+}
+.lit-cities-scroll-track {
+  display: none;
+}
 .lit-city-pill {
   display: inline-flex;
   align-items: center;
@@ -1568,13 +1574,22 @@ body {
   .lit-cities-label {
     font-size: 10px;
   }
+  .lit-cities-scroll-area {
+    display: flex;
+    order: 2;
+    flex: 1 0 100%;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+  }
   .lit-cities-values {
     display: flex;
+    flex: none;
     flex-wrap: nowrap;
     align-items: center;
     gap: 6px;
     font-size: 11px;
-    flex: 1 1 auto;
+    width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
@@ -1585,6 +1600,26 @@ body {
   .lit-cities-values::-webkit-scrollbar {
     display: none;
   }
+  .lit-cities-scroll-track {
+    display: block;
+    flex: none;
+    align-self: center;
+    width: 76px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(var(--accent-rgb), 0.14);
+    overflow: hidden;
+  }
+  .lit-cities-scroll-progress {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+  }
   .lit-city-pill {
     min-height: 24px;
     padding: 4px 9px;
@@ -1592,6 +1627,7 @@ body {
     flex-shrink: 0;
   }
   .map-city-legend {
+    order: 3;
     flex-shrink: 0;
     gap: 10px;
   }
@@ -1707,11 +1743,11 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  padding: 12px 20px;
+  padding: 72px 20px 12px;
 }
 .album-container {
   width: 100%;
-  max-width: 920px;
+  max-width: 700px;
 }
 .album-header {
   margin-bottom: 32px;
@@ -1883,6 +1919,74 @@ body {
 .photo-lightbox-close:hover {
   background: rgba(255, 255, 255, 0.24);
   transform: scale(1.06);
+}
+.photo-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.photo-lightbox-prev {
+  left: max(18px, env(safe-area-inset-left));
+}
+.photo-lightbox-next {
+  right: max(18px, env(safe-area-inset-right));
+}
+.photo-lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateY(-50%) scale(1.06);
+}
+.photo-lightbox-status {
+  position: absolute;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(8, 10, 16, 0.56);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  transform: translateX(-50%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.photo-lightbox-status strong {
+  color: #fff;
+  font-size: 13px;
+}
+
+@media (max-width: 767px) {
+  .photo-lightbox-nav {
+    width: 44px;
+    height: 44px;
+  }
+
+  .photo-lightbox-prev {
+    left: max(8px, env(safe-area-inset-left));
+  }
+
+  .photo-lightbox-next {
+    right: max(8px, env(safe-area-inset-right));
+  }
 }
 
 :root[data-theme="dark"] .album-photo {
