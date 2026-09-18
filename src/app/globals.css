@@ -2400,36 +2400,6 @@ body {
   opacity: 0.92;
 }
 
-.liquid-blob {
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-radius: 42% 58% 63% 37% / 45% 45% 55% 55%;
-  opacity: 0.9;
-  animation: liquid-morph 14s ease-in-out infinite;
-  will-change: transform;
-}
-
-.liquid-blob-1 {
-  background: radial-gradient(circle at 40% 36%, var(--blob-1), transparent 68%);
-}
-.liquid-blob-2 {
-  background: radial-gradient(circle at 56% 42%, var(--blob-2), transparent 68%);
-  animation-delay: -3s;
-}
-.liquid-blob-3 {
-  background: radial-gradient(circle at 44% 38%, var(--blob-3), transparent 68%);
-  animation-delay: -6s;
-}
-.liquid-blob-4 {
-  background: radial-gradient(circle at 52% 46%, var(--blob-2), transparent 68%);
-  animation-delay: -9s;
-}
-.liquid-blob-5 {
-  background: radial-gradient(circle at 46% 40%, var(--blob-3), transparent 68%);
-  animation-delay: -12s;
-}
-
 .liquid-ambient-light {
   position: absolute;
   inset: 0;
@@ -2464,16 +2434,6 @@ body {
   transform: translate3d(-1000px, -1000px, 0);
   transition: opacity 0.35s ease;
   will-change: transform;
-}
-
-@keyframes liquid-morph {
-  0%,
-  100% {
-    border-radius: 42% 58% 63% 37% / 45% 45% 55% 55%;
-  }
-  50% {
-    border-radius: 58% 42% 38% 62% / 54% 60% 40% 46%;
-  }
 }
 
 .glass-card,
@@ -2708,10 +2668,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-background .liquid-blob {
-    animation: none !important;
-  }
-
   .cursor-ambient-light {
     display: none !important;
   }
@@ -2907,8 +2863,8 @@ body {
 }
 
 /* ===== Unified dynamic background field =====
-   Mobile and desktop share the same atmosphere, blobs and particle treatment.
-   Only pointer-driven effects differ, because touch screens have no cursor. */
+   Mobile and desktop share the same atmosphere and particle treatment. Only
+   pointer-driven effects differ, because touch screens have no cursor. */
 html,
 body {
   background-color: var(--bg-primary) !important;
@@ -3900,16 +3856,10 @@ body {
   }
 }
 
-/* Final background pass: keep the atmosphere, all five blobs and particles
-   visually consistent across desktop and touch layouts. */
+/* Final background pass: remove floating blobs and keep one consistent
+   atmosphere plus animated particle field on every viewport. */
 .liquid-background .liquid-atmosphere {
   opacity: 0.92;
-}
-
-.liquid-background .liquid-blob {
-  display: block;
-  opacity: 0.9;
-  animation-duration: 14s;
 }
 
 .liquid-background .liquid-ambient-light {
@@ -3934,10 +3884,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-background .liquid-blob {
-    animation: none;
-  }
-
   .liquid-background .cursor-ambient-light {
     display: none;
   }
