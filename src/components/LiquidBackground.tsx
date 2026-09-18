@@ -48,9 +48,10 @@ export default function LiquidBackground() {
     const nodes = Array.from(root.querySelectorAll<HTMLDivElement>("[data-blob]"));
     if (!nodes.length) return;
 
-    const prefersReducedMotion = window.matchMedia(
+    const reducedMotionQuery = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
-    ).matches;
+    );
+    let prefersReducedMotion = reducedMotionQuery.matches;
     const finePointer =
       window.innerWidth >= 768 &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -120,13 +121,7 @@ export default function LiquidBackground() {
     };
 
     const createParticles = () => {
-      const compactViewport = !finePointer || canvasWidth < 768;
-      const count = compactViewport
-        ? 24
-        : Math.min(
-            54,
-            Math.max(42, Math.round((canvasWidth * canvasHeight) / 19000)),
-          );
+      const count = 54;
       particles.length = 0;
       for (let index = 0; index < count; index += 1) {
         particles.push({
@@ -134,12 +129,8 @@ export default function LiquidBackground() {
           y: Math.random() * canvasHeight,
           vx: (Math.random() - 0.5) * 0.12,
           vy: (Math.random() - 0.5) * 0.12,
-          size: compactViewport
-            ? 1.5 + Math.random() * 2.2
-            : 1.15 + Math.random() * 2.1,
-          alpha: compactViewport
-            ? 0.34 + Math.random() * 0.24
-            : 0.22 + Math.random() * 0.2,
+          size: 1.15 + Math.random() * 2.1,
+          alpha: 0.22 + Math.random() * 0.2,
           phase: Math.random() * Math.PI * 2,
         });
       }
@@ -153,13 +144,18 @@ export default function LiquidBackground() {
         const dx = mouseX - particle.x;
         const dy = mouseY - particle.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        const proximity = pointerActive && distance < 320
+        const proximity = finePointer && pointerActive && distance < 320
           ? 1 - distance / 320
           : 0;
         const pulse = 0.82 + Math.sin(time * 0.8 + particle.phase) * 0.18;
         const alpha = particle.alpha * pulse + proximity * 0.14;
 
-        if (pointerActive && pointerSpeed > 0.4 && proximity > 0.02) {
+        if (
+          finePointer &&
+          pointerActive &&
+          pointerSpeed > 0.4 &&
+          proximity > 0.02
+        ) {
           particleContext.beginPath();
           particleContext.moveTo(
             particle.x - particle.vx * 22,
@@ -212,11 +208,9 @@ export default function LiquidBackground() {
     };
 
     const placeInitialBlobs = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
       blobs.forEach((state) => {
-        state.x = state.baseX * width;
-        state.y = state.baseY * height;
+        state.x = state.baseX * canvasWidth;
+        state.y = state.baseY * canvasHeight;
         positionBlob(state, state.x - state.size / 2, state.y - state.size / 2);
       });
     };
@@ -232,25 +226,12 @@ export default function LiquidBackground() {
 
     const themeObserver = new MutationObserver(() => {
       refreshParticleTheme();
-      if (!finePointer) drawParticles();
+      if (prefersReducedMotion) drawParticles();
     });
     themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-theme"],
     });
-
-    // 触摸设备只绘制一帧低密度装饰粒子，不启动 RAF、指针物理或光晕跟随。
-    // 这样移动端能保留一点空间层次，同时避免主题切换和 backdrop-filter 叠加闪烁。
-    if (!finePointer) {
-      if (cursorLight) cursorLight.remove();
-      drawParticles();
-      window.addEventListener("resize", resizeParticleCanvas, { passive: true });
-
-      return () => {
-        themeObserver.disconnect();
-        window.removeEventListener("resize", resizeParticleCanvas);
-      };
-    }
 
     const onHashChange = () => {
       scrollTarget = getPageDepth();
@@ -287,9 +268,10 @@ export default function LiquidBackground() {
     };
 
     const animate = () => {
+      raf = 0;
+      if (document.hidden || prefersReducedMotion) return;
+
       time += 0.008;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
       pointerSpeed *= 0.9;
 
       scrollVelocity += (scrollTarget - scrollCurrent) * 0.014;
@@ -300,14 +282,15 @@ export default function LiquidBackground() {
       cursorY += (mouseY - cursorY) * 0.07;
       if (finePointer && cursorLight) {
         cursorLight.style.opacity = pointerActive ? "1" : "0";
-        cursorLight.style.transform = `translate3d(${cursorX - 140}px, ${cursorY - 140}px, 0)`;
+        cursorLight.style.transform = `translate3d(${cursorX - 160}px, ${cursorY - 160}px, 0)`;
       }
 
       blobs.forEach((state) => {
         const targetX =
-          state.baseX * width + Math.sin(time * state.speed + state.phase) * 22;
+          state.baseX * canvasWidth +
+          Math.sin(time * state.speed + state.phase) * 22;
         const targetY =
-          state.baseY * height +
+          state.baseY * canvasHeight +
           Math.cos(time * state.speed * 0.82 + state.phase * 1.4) * 26 +
           scrollCurrent * state.scrollFactor * 260;
 
@@ -345,7 +328,12 @@ export default function LiquidBackground() {
         const dx = mouseX - particle.x;
         const dy = mouseY - particle.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (pointerActive && distance < 360 && distance > 0.01) {
+        if (
+          finePointer &&
+          pointerActive &&
+          distance < 360 &&
+          distance > 0.01
+        ) {
           const proximity = 1 - distance / 360;
           const repulsion = proximity * proximity * (prefersReducedMotion ? 0.034 : 0.058);
           particle.vx -= (dx / distance) * repulsion;
@@ -370,20 +358,84 @@ export default function LiquidBackground() {
       raf = requestAnimationFrame(animate);
     };
 
+    const stopAnimation = () => {
+      if (!raf) return;
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    const startAnimation = () => {
+      if (raf || document.hidden || prefersReducedMotion) return;
+      raf = requestAnimationFrame(animate);
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
+    };
+
+    const onReducedMotionChange = (event: MediaQueryListEvent) => {
+      prefersReducedMotion = event.matches;
+      if (prefersReducedMotion) {
+        stopAnimation();
+        pointerActive = false;
+        cursorX = -1000;
+        cursorY = -1000;
+        if (cursorLight) cursorLight.style.opacity = "0";
+        drawParticles();
+        return;
+      }
+
+      startAnimation();
+    };
+
+    const resizeBackground = () => {
+      const previousWidth = canvasWidth;
+      const previousHeight = canvasHeight;
+      resizeParticleCanvas();
+
+      if (particles.length && previousWidth && previousHeight) {
+        particles.forEach((particle) => {
+          particle.x = (particle.x / previousWidth) * canvasWidth;
+          particle.y = (particle.y / previousHeight) * canvasHeight;
+        });
+      }
+
+      if (prefersReducedMotion) drawParticles();
+    };
+
     scrollTarget = getPageDepth();
     window.addEventListener("hashchange", onHashChange);
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerleave", onPointerLeave, { passive: true });
-    window.addEventListener("resize", resizeParticleCanvas, { passive: true });
-    raf = requestAnimationFrame(animate);
+    window.addEventListener("resize", resizeBackground, { passive: true });
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    reducedMotionQuery.addEventListener("change", onReducedMotionChange);
+    if (finePointer) {
+      window.addEventListener("pointermove", onPointerMove, { passive: true });
+      window.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    } else if (cursorLight) {
+      cursorLight.style.opacity = "0";
+    }
+
+    if (prefersReducedMotion) {
+      drawParticles();
+    } else {
+      startAnimation();
+    }
 
     return () => {
-      cancelAnimationFrame(raf);
+      stopAnimation();
       themeObserver.disconnect();
       window.removeEventListener("hashchange", onHashChange);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerleave", onPointerLeave);
-      window.removeEventListener("resize", resizeParticleCanvas);
+      window.removeEventListener("resize", resizeBackground);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      reducedMotionQuery.removeEventListener("change", onReducedMotionChange);
+      if (finePointer) {
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerleave", onPointerLeave);
+      }
     };
   }, []);
 

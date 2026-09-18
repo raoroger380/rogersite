@@ -2693,8 +2693,6 @@ body {
     --glass-blur: 12px;
   }
 
-  .liquid-blob-4,
-  .liquid-blob-5,
   .cursor-ambient-light {
     display: none !important;
   }
@@ -2710,7 +2708,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-background .liquid-blob,
+  .liquid-background .liquid-blob {
+    animation: none !important;
+  }
+
   .cursor-ambient-light {
     display: none !important;
   }
@@ -2905,20 +2906,9 @@ body {
   }
 }
 
-/* Keep narrow viewports particle-free even when the browser reports a fine
-   pointer while using responsive emulation. */
-@media (max-width: 767px) {
-  .liquid-particle-canvas {
-    display: block !important;
-    opacity: 0.64;
-    filter: none;
-  }
-}
-
-/* ===== Monochrome background field =====
-   Keep the page surface pure black or white. The accent is reserved for the
-   intentionally sparse particle layer, so glass surfaces and text remain the
-   visual hierarchy instead of competing with a full-screen gradient. */
+/* ===== Unified dynamic background field =====
+   Mobile and desktop share the same atmosphere, blobs and particle treatment.
+   Only pointer-driven effects differ, because touch screens have no cursor. */
 html,
 body {
   background-color: var(--bg-primary) !important;
@@ -2927,14 +2917,6 @@ body {
 .liquid-background,
 .theme-transition-orb > .liquid-background {
   background: var(--bg-primary) !important;
-}
-
-.liquid-background .liquid-atmosphere,
-.liquid-background .liquid-blob,
-.liquid-background .liquid-ambient-light,
-.liquid-background .liquid-noise {
-  opacity: 0 !important;
-  animation: none !important;
 }
 
 .liquid-particle-canvas {
@@ -2952,8 +2934,8 @@ body {
 
   .liquid-particle-canvas {
     display: block !important;
-    opacity: 0.64;
-    filter: none;
+    opacity: 0.92;
+    filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.24));
   }
 
   .liquid-background .cursor-ambient-light {
@@ -2966,7 +2948,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 1;
-  display: none;
+  display: block;
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -2998,8 +2980,8 @@ body {
 @media (max-width: 767px), (hover: none), (pointer: coarse) {
   .liquid-particle-canvas {
     display: block !important;
-    opacity: 0.64;
-    filter: none;
+    opacity: 0.92;
+    filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.24));
   }
 
   .liquid-background .cursor-ambient-light {
@@ -3032,11 +3014,6 @@ body {
       inset 0 1px 0 rgba(255, 255, 255, 0.12),
       inset 0 -1px 0 rgba(0, 0, 0, 0.1),
       0 10px 24px rgba(5, 11, 18, 0.18);
-  }
-
-  .liquid-blob {
-    opacity: 0.62;
-    animation-duration: 22s;
   }
 
   .glass-card:hover,
@@ -3524,15 +3501,6 @@ body {
   }
 }
 
-/* Final narrow viewport guard for responsive browser emulation. */
-@media (max-width: 767px) {
-  .liquid-particle-canvas {
-    display: block !important;
-    opacity: 0.64;
-    filter: none;
-  }
-}
-
 @keyframes theme-ripple {
   from {
     clip-path: circle(0 at var(--theme-origin-x) var(--theme-origin-y));
@@ -3932,11 +3900,45 @@ body {
   }
 }
 
-/* Final narrow viewport guard for responsive browser emulation. */
-@media (max-width: 767px) {
-  .liquid-particle-canvas {
-    display: block !important;
-    opacity: 0.64;
-    filter: none;
+/* Final background pass: keep the atmosphere, all five blobs and particles
+   visually consistent across desktop and touch layouts. */
+.liquid-background .liquid-atmosphere {
+  opacity: 0.92;
+}
+
+.liquid-background .liquid-blob {
+  display: block;
+  opacity: 0.9;
+  animation-duration: 14s;
+}
+
+.liquid-background .liquid-ambient-light {
+  display: block;
+  opacity: 0.5;
+}
+
+.liquid-background .liquid-noise {
+  display: block;
+}
+
+.liquid-particle-canvas {
+  display: block;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.28));
+}
+
+@media (max-width: 767px), (hover: none), (pointer: coarse) {
+  .liquid-background .cursor-ambient-light {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-background .liquid-blob {
+    animation: none;
+  }
+
+  .liquid-background .cursor-ambient-light {
+    display: none;
   }
 }
